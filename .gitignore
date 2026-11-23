@@ -1,0 +1,11 @@
+# Environment Variables (Jangan diunggah ke publik)
+.env
+.env.local
+.env.*.local
+
+# Operating System Files
+Thumbs.db
+.DS_Store
+
+# Temporary & Log Files
+*.log

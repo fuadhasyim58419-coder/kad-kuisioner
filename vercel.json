@@ -1,0 +1,34 @@
+{
+  "version": 2,
+  "functions": {
+    "api/*.php": {
+      "runtime": "vercel-php@0.7.4"
+    }
+  },
+  "routes": [
+    {
+      "src": "/assets/(.*)",
+      "dest": "/assets/$1"
+    },
+    {
+      "src": "/proses_survei.php",
+      "dest": "/api/proses_survei.php"
+    },
+    {
+      "src": "/dashboard.php",
+      "dest": "/api/dashboard.php"
+    },
+    {
+      "src": "/login.php",
+      "dest": "/api/login.php"
+    },
+    {
+      "src": "/test_sheets.php",
+      "dest": "/api/test_sheets.php"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/$1"
+    }
+  ]
+}

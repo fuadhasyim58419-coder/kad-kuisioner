@@ -1,0 +1,1511 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Survei Kepuasan Pelanggan - PT Kaltim Adhiguna Dermaga</title>
+    <!-- Google Font: Plus Jakarta Sans (Modern BUMN / Enterprise Standard) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            /* Pelindo & Maritime Corporate Color Palette */
+            --pelindo-navy: #002d62;
+            --pelindo-blue: #005b96;
+            --pelindo-cyan: #00a3e0;
+            --pelindo-light-blue: #eef7fc;
+            --pelindo-dark: #0f172a;
+            --pelindo-slate: #1e293b;
+            --pelindo-gray: #64748b;
+            --pelindo-light-gray: #f8fafc;
+            --pelindo-border: #e2e8f0;
+            --white: #ffffff;
+            --pelindo-gold: #f59e0b;
+
+            /* Likert 4 Color Scheme */
+            --tp-color: #ef4444;
+            --tp-light: #fef2f2;
+            --cp-color: #f59e0b;
+            --cp-light: #fffbeb;
+            --p-color: #0284c7;
+            --p-light: #f0f9ff;
+            --sp-color: #10b981;
+            --sp-light: #ecfdf5;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f1f5f9;
+            color: var(--pelindo-slate);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        /* 1. TOP CORPORATE NAVBAR */
+        .top-navbar {
+            background-color: var(--white);
+            border-bottom: 1.5px solid var(--pelindo-border);
+            padding: 12px 24px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 12px rgba(0, 45, 98, 0.04);
+        }
+
+        .top-navbar-container {
+            max-width: 1080px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+        }
+
+        .brand-group {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            text-decoration: none;
+        }
+
+        .brand-logo {
+            height: 48px;
+            width: auto;
+            object-fit: contain;
+            border-radius: 4px;
+        }
+
+        .brand-text h1 {
+            font-size: 1.05rem;
+            font-weight: 800;
+            color: var(--pelindo-navy);
+            letter-spacing: -0.2px;
+            line-height: 1.2;
+        }
+
+        .brand-text p {
+            font-size: 0.78rem;
+            color: var(--pelindo-gray);
+            font-weight: 600;
+            letter-spacing: 0.2px;
+        }
+
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .spm-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background-color: var(--pelindo-light-blue);
+            color: var(--pelindo-blue);
+            padding: 6px 14px;
+            border-radius: 50px;
+            font-size: 0.78rem;
+            font-weight: 700;
+            border: 1px solid rgba(0, 163, 224, 0.25);
+        }
+
+        .spm-badge svg {
+            width: 14px;
+            height: 14px;
+            fill: currentColor;
+        }
+
+        .btn-admin-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--pelindo-navy);
+            font-size: 0.82rem;
+            font-weight: 700;
+            text-decoration: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+        }
+
+        .btn-admin-link:hover {
+            background-color: #f1f5f9;
+            color: var(--pelindo-cyan);
+        }
+
+        /* 2. HERO MARITIME BANNER (PELINDO STYLE) */
+        .hero-banner {
+            position: relative;
+            background: linear-gradient(135deg, rgba(0, 45, 98, 0.94) 0%, rgba(0, 80, 140, 0.88) 55%, rgba(0, 140, 200, 0.78) 100%),
+                        url('assets/img/dermaga_kad.jpg') center/cover no-repeat;
+            color: var(--white);
+            padding: 56px 20px 72px;
+            text-align: center;
+            overflow: hidden;
+        }
+
+        .hero-banner::after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 24px;
+            background: linear-gradient(to top, #f1f5f9, transparent);
+        }
+
+        .hero-content {
+            max-width: 860px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 2;
+        }
+
+        .hero-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255, 255, 255, 0.16);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            padding: 6px 18px;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            margin-bottom: 18px;
+        }
+
+        .hero-title {
+            font-size: 2.1rem;
+            font-weight: 800;
+            margin-bottom: 12px;
+            line-height: 1.25;
+            letter-spacing: -0.5px;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .hero-desc {
+            font-size: 1.02rem;
+            color: rgba(255, 255, 255, 0.92);
+            max-width: 680px;
+            margin: 0 auto 28px;
+            line-height: 1.6;
+        }
+
+        .hero-highlights {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px 20px;
+        }
+
+        .highlight-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background-color: rgba(15, 23, 42, 0.45);
+            backdrop-filter: blur(4px);
+            padding: 6px 14px;
+            border-radius: 8px;
+            font-size: 0.82rem;
+            font-weight: 600;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+
+        /* 3. MAIN FORM CONTAINER */
+        .main-wrapper {
+            max-width: 920px;
+            margin: -36px auto 60px;
+            padding: 0 16px;
+            position: relative;
+            z-index: 10;
+        }
+
+        .survey-card-container {
+            background-color: var(--white);
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 45, 98, 0.08), 0 1px 3px rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--pelindo-border);
+            overflow: hidden;
+        }
+
+        /* STEP WIZARD BAR */
+        .step-progress-wrapper {
+            background-color: #ffffff;
+            border-bottom: 1.5px solid var(--pelindo-border);
+            padding: 20px 32px;
+        }
+
+        .step-progress-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .step-progress-title {
+            font-size: 0.96rem;
+            font-weight: 800;
+            color: var(--pelindo-navy);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .step-badge {
+            background-color: var(--pelindo-blue);
+            color: var(--white);
+            font-size: 0.75rem;
+            font-weight: 800;
+            padding: 4px 10px;
+            border-radius: 50px;
+            letter-spacing: 0.5px;
+        }
+
+        .step-progress-number {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--pelindo-gray);
+        }
+
+        .step-progress-bar-bg {
+            height: 8px;
+            background-color: #e2e8f0;
+            border-radius: 50px;
+            overflow: hidden;
+        }
+
+        .step-progress-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--pelindo-blue), var(--pelindo-cyan));
+            width: 50%;
+            transition: width 0.4s ease;
+            border-radius: 50px;
+        }
+
+        /* FORM BODY */
+        form {
+            padding: 32px;
+        }
+
+        /* CARD IDENTITAS */
+        .identity-box {
+            background-color: #ffffff;
+            border: 1.5px solid var(--pelindo-border);
+            border-radius: 12px;
+            padding: 28px;
+            margin-bottom: 28px;
+        }
+
+        .identity-header {
+            border-bottom: 1.5px solid var(--pelindo-border);
+            padding-bottom: 16px;
+            margin-bottom: 24px;
+        }
+
+        .identity-header h2 {
+            font-size: 1.25rem;
+            color: var(--pelindo-navy);
+            font-weight: 800;
+            margin-bottom: 6px;
+        }
+
+        .identity-header p {
+            font-size: 0.92rem;
+            color: var(--pelindo-gray);
+        }
+
+        .form-group {
+            margin-bottom: 22px;
+        }
+
+        .form-group label {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-weight: 700;
+            font-size: 0.92rem;
+            color: var(--pelindo-slate);
+            margin-bottom: 8px;
+        }
+
+        .form-group label span.required {
+            color: #ef4444;
+            font-weight: bold;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 13px 16px;
+            border: 1.5px solid var(--pelindo-border);
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 0.95rem;
+            color: var(--pelindo-dark);
+            background-color: #fafbfc;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+        }
+
+        .form-control:focus {
+            outline: none;
+            background-color: #ffffff;
+            border-color: var(--pelindo-blue);
+            box-shadow: 0 0 0 4px rgba(0, 91, 150, 0.12);
+        }
+
+        textarea.form-control {
+            resize: vertical;
+            min-height: 85px;
+        }
+
+        .form-hint {
+            font-size: 0.8rem;
+            color: var(--pelindo-gray);
+            margin-top: 6px;
+        }
+
+        /* LIKERT LEGEND BANNER */
+        .likert-legend-bar {
+            background-color: #f8fafc;
+            border: 1.5px solid var(--pelindo-border);
+            border-radius: 12px;
+            padding: 16px 20px;
+            margin-bottom: 28px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around;
+            gap: 12px;
+            font-size: 0.85rem;
+            font-weight: 700;
+        }
+
+        .legend-item {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .legend-dot {
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--white);
+            font-size: 0.75rem;
+            font-weight: 800;
+        }
+
+        .dot-tp { background-color: var(--tp-color); }
+        .dot-cp { background-color: var(--cp-color); }
+        .dot-p  { background-color: var(--p-color); }
+        .dot-sp { background-color: var(--sp-color); }
+
+        /* DIMENSION CARD */
+        .dimension-card {
+            background-color: var(--white);
+            border: 1.5px solid var(--pelindo-border);
+            border-radius: 14px;
+            margin-bottom: 28px;
+            overflow: hidden;
+            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.02);
+        }
+
+        .dimension-header {
+            background: linear-gradient(90deg, var(--pelindo-navy) 0%, var(--pelindo-blue) 100%);
+            color: var(--white);
+            padding: 14px 22px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .dim-badge {
+            background-color: var(--white);
+            color: var(--pelindo-navy);
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 1rem;
+            flex-shrink: 0;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+        }
+
+        .dimension-header h2 {
+            font-size: 1.15rem;
+            font-weight: 700;
+            letter-spacing: -0.2px;
+        }
+
+        .dimension-header h2 i {
+            font-weight: 500;
+            opacity: 0.9;
+        }
+
+        /* QUESTION ROWS */
+        .question-item {
+            padding: 22px;
+            border-bottom: 1.5px solid var(--pelindo-border);
+            transition: background-color 0.15s ease;
+        }
+
+        .question-item:last-child {
+            border-bottom: none;
+        }
+
+        .question-item:hover {
+            background-color: #fafcfe;
+        }
+
+        .question-title {
+            font-weight: 700;
+            font-size: 0.98rem;
+            color: var(--pelindo-slate);
+            margin-bottom: 16px;
+            line-height: 1.5;
+        }
+
+        .question-title i {
+            font-style: italic;
+            color: inherit;
+        }
+
+        /* 4 LIKERT OPTIONS (COLOR-CODED INTERACTIVE PILLS) */
+        .likert-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+        }
+
+        .likert-option {
+            position: relative;
+        }
+
+        .likert-option input[type="radio"] {
+            position: absolute;
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .likert-label {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 12px 10px;
+            border: 2px solid var(--pelindo-border);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background-color: #ffffff;
+            min-height: 74px;
+            user-select: none;
+        }
+
+        .opt-score {
+            font-size: 1.25rem;
+            font-weight: 800;
+            margin-bottom: 2px;
+            transition: color 0.2s ease;
+        }
+
+        .opt-text {
+            font-size: 0.78rem;
+            font-weight: 700;
+            color: var(--pelindo-gray);
+            line-height: 1.2;
+            transition: color 0.2s ease;
+        }
+
+        /* Hover States */
+        .likert-option input[type="radio"]:hover + .likert-label {
+            border-color: #94a3b8;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        /* Checked States with Pelindo Likert Colors */
+        /* 1 - TP (Tidak Puas) */
+        .likert-option.opt-tp input[type="radio"]:checked + .likert-label {
+            background-color: var(--tp-color);
+            border-color: #b91c1c;
+            color: #ffffff;
+            box-shadow: 0 6px 14px rgba(239, 68, 68, 0.35);
+        }
+        .likert-option.opt-tp input[type="radio"]:checked + .likert-label .opt-score,
+        .likert-option.opt-tp input[type="radio"]:checked + .likert-label .opt-text {
+            color: #ffffff;
+        }
+
+        /* 2 - CP (Cukup Puas) */
+        .likert-option.opt-cp input[type="radio"]:checked + .likert-label {
+            background-color: var(--cp-color);
+            border-color: #b45309;
+            color: #ffffff;
+            box-shadow: 0 6px 14px rgba(245, 158, 11, 0.35);
+        }
+        .likert-option.opt-cp input[type="radio"]:checked + .likert-label .opt-score,
+        .likert-option.opt-cp input[type="radio"]:checked + .likert-label .opt-text {
+            color: #ffffff;
+        }
+
+        /* 3 - P (Puas) */
+        .likert-option.opt-p input[type="radio"]:checked + .likert-label {
+            background-color: var(--p-color);
+            border-color: #0369a1;
+            color: #ffffff;
+            box-shadow: 0 6px 14px rgba(2, 132, 199, 0.35);
+        }
+        .likert-option.opt-p input[type="radio"]:checked + .likert-label .opt-score,
+        .likert-option.opt-p input[type="radio"]:checked + .likert-label .opt-text {
+            color: #ffffff;
+        }
+
+        /* 4 - SP (Sangat Puas) */
+        .likert-option.opt-sp input[type="radio"]:checked + .likert-label {
+            background-color: var(--sp-color);
+            border-color: #047857;
+            color: #ffffff;
+            box-shadow: 0 6px 14px rgba(16, 185, 129, 0.35);
+        }
+        .likert-option.opt-sp input[type="radio"]:checked + .likert-label .opt-score,
+        .likert-option.opt-sp input[type="radio"]:checked + .likert-label .opt-text {
+            color: #ffffff;
+        }
+
+        /* SUGGESTION / FEEDBACK SECTION */
+        .suggestion-box {
+            background-color: #f8fafc;
+            border: 1.5px solid var(--pelindo-border);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 28px;
+        }
+
+        .suggestion-box label {
+            display: block;
+            font-size: 1.05rem;
+            font-weight: 800;
+            color: var(--pelindo-navy);
+            margin-bottom: 6px;
+        }
+
+        .suggestion-box p {
+            font-size: 0.88rem;
+            color: var(--pelindo-gray);
+            margin-bottom: 14px;
+        }
+
+        /* NAVIGATION BUTTONS */
+        .btn-action-group {
+            display: flex;
+            gap: 16px;
+            align-items: center;
+        }
+
+        .btn-prev {
+            padding: 16px 28px;
+            background-color: #ffffff;
+            color: var(--pelindo-slate);
+            font-size: 1rem;
+            font-weight: 700;
+            border: 2px solid #cbd5e1;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: inherit;
+        }
+
+        .btn-prev:hover {
+            background-color: #f1f5f9;
+            border-color: #94a3b8;
+        }
+
+        .btn-next, .btn-submit {
+            flex: 1;
+            padding: 16px 28px;
+            background: linear-gradient(135deg, var(--pelindo-navy) 0%, var(--pelindo-blue) 100%);
+            color: var(--white);
+            font-size: 1.05rem;
+            font-weight: 800;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-family: inherit;
+            letter-spacing: 0.3px;
+            box-shadow: 0 8px 20px rgba(0, 45, 98, 0.25);
+            transition: all 0.2s ease;
+            text-align: center;
+        }
+
+        .btn-next:hover, .btn-submit:hover {
+            background: linear-gradient(135deg, #001f44 0%, #004d80 100%);
+            box-shadow: 0 10px 25px rgba(0, 45, 98, 0.35);
+            transform: translateY(-2px);
+        }
+
+        .btn-next:active, .btn-submit:active {
+            transform: translateY(0);
+        }
+
+        /* 4. FOOTER (PELINDO MARITIME CORPORATE) */
+        .site-footer {
+            background-color: #0f172a;
+            color: #94a3b8;
+            padding: 40px 20px 30px;
+            font-size: 0.86rem;
+            border-top: 4px solid var(--pelindo-cyan);
+            text-align: center;
+        }
+
+        .footer-container {
+            max-width: 860px;
+            margin: 0 auto;
+        }
+
+        .footer-brand {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .footer-logo {
+            height: 36px;
+            width: auto;
+            background: #ffffff;
+            padding: 3px 6px;
+            border-radius: 4px;
+        }
+
+        .footer-company {
+            color: #ffffff;
+            font-weight: 800;
+            font-size: 1rem;
+        }
+
+        .footer-info {
+            line-height: 1.6;
+            margin-bottom: 16px;
+            color: #cbd5e1;
+        }
+
+        .footer-links {
+            margin-top: 14px;
+            padding-top: 14px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 0.8rem;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .footer-links a {
+            color: var(--pelindo-cyan);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .footer-links a:hover {
+            text-decoration: underline;
+        }
+
+        /* RESPONSIVE DESIGN (HP / MOBILE) */
+        @media (max-width: 640px) {
+            .top-navbar {
+                padding: 10px 14px;
+            }
+
+            .brand-logo {
+                height: 38px;
+            }
+
+            .brand-text h1 {
+                font-size: 0.92rem;
+            }
+
+            .brand-text p {
+                font-size: 0.72rem;
+            }
+
+            .spm-badge {
+                display: none;
+            }
+
+            .hero-banner {
+                padding: 36px 14px 50px;
+            }
+
+            .hero-title {
+                font-size: 1.45rem;
+            }
+
+            .hero-desc {
+                font-size: 0.88rem;
+            }
+
+            .main-wrapper {
+                margin-top: -24px;
+                padding: 0 10px;
+            }
+
+            .step-progress-wrapper {
+                padding: 14px 18px;
+            }
+
+            form {
+                padding: 20px 14px;
+            }
+
+            .identity-box {
+                padding: 18px 14px;
+            }
+
+            .likert-grid {
+                grid-template-columns: 1fr;
+                gap: 8px;
+            }
+
+            .likert-label {
+                flex-direction: row;
+                justify-content: flex-start;
+                min-height: 50px;
+                padding: 10px 16px;
+                gap: 14px;
+                text-align: left;
+            }
+
+            .opt-score {
+                margin-bottom: 0;
+                width: 28px;
+                height: 28px;
+                border-radius: 50%;
+                background-color: #f1f5f9;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 0.95rem;
+            }
+
+            .likert-option input[type="radio"]:checked + .likert-label .opt-score {
+                background-color: rgba(255, 255, 255, 0.25);
+                color: #ffffff;
+            }
+
+            .opt-text {
+                font-size: 0.92rem;
+            }
+
+            .btn-action-group {
+                flex-direction: column-reverse;
+            }
+
+            .btn-prev, .btn-next, .btn-submit {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 1. TOP CORPORATE NAVBAR -->
+    <header class="top-navbar">
+        <div class="top-navbar-container">
+            <a href="index.html" class="brand-group">
+                <img src="assets/img/logo_kad.jpg" alt="Logo PT KAD" class="brand-logo">
+                <div class="brand-text">
+                    <h1>PT KALTIM ADHIGUNA DERMAGA</h1>
+                    <p>Pelayanan Jasa Bongkar Muat (Stevedoring) &bull; Pelabuhan Bontang</p>
+                </div>
+            </a>
+            <div class="nav-actions">
+                <div class="spm-badge">
+                    <svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/></svg>
+                    <span>Standar Pelayanan Prima</span>
+                </div>
+                <a href="login.php" class="btn-admin-link" id="nav-portal-admin">Portal Admin &rarr;</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- 2. HERO MARITIME BANNER (PELINDO VIBE DENGAN FOTO ASLI DERMAGA KAD) -->
+    <section class="hero-banner">
+        <div class="hero-content">
+            <div class="hero-tag">
+                <span>&#9875; PORT &amp; STEVEDORING EXCELLENCE</span>
+            </div>
+            <h1 class="hero-title">Survei Kepuasan Pelanggan</h1>
+            <p class="hero-desc">Evaluasi Mutu Pelayanan Operasional Bongkar Muat (Stevedoring) PT Kaltim Adhiguna Dermaga demi Terwujudnya Pelayanan Kepelabuhanan yang Prima, Aman, dan Andal.</p>
+            <div class="hero-highlights">
+                <span class="highlight-pill">&#128737;&#65039; Keamanan Kargo (Zero Damage)</span>
+                <span class="highlight-pill">&#9201;&#65039; Ketepatan Waktu &amp; Jadwal</span>
+                <span class="highlight-pill">&#129466; Standar Keselamatan K3 Lapangan</span>
+                <span class="highlight-pill">&#128202; Skala Penilaian Likert 4 Resmi</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- 3. MAIN FORM CONTAINER -->
+    <main class="main-wrapper" id="survey-top">
+        <div class="survey-card-container">
+
+            <!-- STEP INDICATOR WIZARD -->
+            <div class="step-progress-wrapper">
+                <div class="step-progress-header">
+                    <div class="step-progress-title">
+                        <span class="step-badge" id="step-badge-text">LANGKAH 1/2</span>
+                        <span id="step-title-text">Identitas Responden &amp; Mitra Perusahaan</span>
+                    </div>
+                    <span class="step-progress-number" id="step-counter-text">Tahap 1 dari 2</span>
+                </div>
+                <div class="step-progress-bar-bg">
+                    <div class="step-progress-bar-fill" id="progress-fill"></div>
+                </div>
+            </div>
+
+            <form id="form-survei" action="proses_survei.php" method="POST">
+
+                <!-- ======================================================== -->
+                <!-- JENDELA 1: IDENTITAS RESPONDEN                           -->
+                <!-- ======================================================== -->
+                <div id="step-1" class="step-section">
+                    <div class="identity-box">
+                        <div class="identity-header">
+                            <h2>Informasi Mitra / Responden</h2>
+                            <p>Mohon lengkapi data perwakilan perusahaan pengguna jasa sebelum melanjutkan ke pengisian lembar evaluasi.</p>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="nama_responden">&#128100; Nama Lengkap Responden <span class="required">*</span></label>
+                            <input type="text" id="nama_responden" name="nama_responden" class="form-control" placeholder=" " required>
+                            <p class="form-hint">Nama personel atau penanggung jawab operasional yang mengisi kuesioner.</p>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="nama_perusahaan">&#127970; Nama Perusahaan  <span class="required">*</span></label>
+                            <input type="text" id="nama_perusahaan" name="nama_perusahaan" class="form-control" placeholder=" " required>
+                            <p class="form-hint">Nama perusahaan pemilik kargo (shipper/consignee) atau keagenan kapal.</p>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="alamat_perusahaan">&#128205; Alamat Kantor Perusahaan <span class="required">*</span></label>
+                            <textarea id="alamat_perusahaan" name="alamat_perusahaan" class="form-control" placeholder=" " required></textarea>
+                            <p class="form-hint">Alamat kantor atau perwakilan operasional perusahaan.</p>
+                        </div>
+                    </div>
+
+                    <div class="btn-action-group">
+                        <button type="button" class="btn-next" onclick="goToStep(2)">Lanjut ke Lembar Kuesioner (20 Pertanyaan) &rarr;</button>
+                    </div>
+                </div>
+
+                <!-- ======================================================== -->
+                <!-- JENDELA 2: LEMBAR PENILAIAN KUESIONER                    -->
+                <!-- ======================================================== -->
+                <div id="step-2" class="step-section" style="display: none;">
+                    
+                    <!-- PANDUAN SKALA LIKERT RESMI KAD -->
+                    <div class="likert-legend-bar">
+                        <div class="legend-item"><span class="legend-dot dot-tp">1</span> Tidak Puas (TP)</div>
+                        <div class="legend-item"><span class="legend-dot dot-cp">2</span> Cukup Puas (CP)</div>
+                        <div class="legend-item"><span class="legend-dot dot-p">3</span> Puas (P)</div>
+                        <div class="legend-item"><span class="legend-dot dot-sp">4</span> Sangat Puas (SP)</div>
+                    </div>
+
+                    <!-- 1. DIMENSI DAYA TANGGAP (RESPONSIVENESS) -->
+                    <section class="dimension-card">
+                        <div class="dimension-header">
+                            <div class="dim-badge">A</div>
+                            <h2>1. Daya Tanggap (<i>Responsiveness</i>)</h2>
+                        </div>
+
+                        <div class="question-item">
+                            <p class="question-title">1. Kecepatan dan ketepatan petugas dalam merespons komunikasi (telepon, pesan, atau email) dari pelanggan.</p>
+                            <div class="likert-grid">
+                                <div class="likert-option opt-tp">
+                                    <input type="radio" id="resp_1_1" name="resp_1" value="1" required>
+                                    <label class="likert-label" for="resp_1_1"><span class="opt-score">1</span><span class="opt-text">Tidak Puas</span></label>
+                                </div>
+                                <div class="likert-option opt-cp">
+                                    <input type="radio" id="resp_1_2" name="resp_1" value="2">
+                                    <label class="likert-label" for="resp_1_2"><span class="opt-score">2</span><span class="opt-text">Cukup Puas</span></label>
+                                </div>
+                                <div class="likert-option opt-p">
+                                    <input type="radio" id="resp_1_3" name="resp_1" value="3">
+                                    <label class="likert-label" for="resp_1_3"><span class="opt-score">3</span><span class="opt-text">Puas</span></label>
+                                </div>
+                                <div class="likert-option opt-sp">
+                                    <input type="radio" id="resp_1_4" name="resp_1" value="4">
+                                    <label class="likert-label" for="resp_1_4"><span class="opt-score">4</span><span class="opt-text">Sangat Puas</span></label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="question-item">
+                            <p class="question-title">2. Kemudahan dan kecepatan dalam proses administrasi serta alur pemesanan layanan bongkar muat.</p>
+                            <div class="likert-grid">
+                                <div class="likert-option opt-tp">
+                                    <input type="radio" id="resp_2_1" name="resp_2" value="1" required>
+                                    <label class="likert-label" for="resp_2_1"><span class="opt-score">1</span><span class="opt-text">Tidak Puas</span></label>
+                                </div>
+                                <div class="likert-option opt-cp">
+                                    <input type="radio" id="resp_2_2" name="resp_2" value="2">
+                                    <label class="likert-label" for="resp_2_2"><span class="opt-score">2</span><span class="opt-text">Cukup Puas</span></label>
+                                </div>
+                                <div class="likert-option opt-p">
+                                    <input type="radio" id="resp_2_3" name="resp_2" value="3">
+                                    <label class="likert-label" for="resp_2_3"><span class="opt-score">3</span><span class="opt-text">Puas</span></label>
+                                </div>
+                                <div class="likert-option opt-sp">
+                                    <input type="radio" id="resp_2_4" name="resp_2" value="4">
+                                    <label class="likert-label" for="resp_2_4"><span class="opt-score">4</span><span class="opt-text">Sangat Puas</span></label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="question-item">
+                            <p class="question-title">3. Sikap proaktif petugas dalam memberikan informasi dan <i>update</i> perkembangan kegiatan operasional secara berkala.</p>
+                            <div class="likert-grid">
+                                <div class="likert-option opt-tp">
+                                    <input type="radio" id="resp_3_1" name="resp_3" value="1" required>
+                                    <label class="likert-label" for="resp_3_1"><span class="opt-score">1</span><span class="opt-text">Tidak Puas</span></label>
+                                </div>
+                                <div class="likert-option opt-cp">
+                                    <input type="radio" id="resp_3_2" name="resp_3" value="2">
+                                    <label class="likert-label" for="resp_3_2"><span class="opt-score">2</span><span class="opt-text">Cukup Puas</span></label>
+                                </div>
+                                <div class="likert-option opt-p">
+                                    <input type="radio" id="resp_3_3" name="resp_3" value="3">
+                                    <label class="likert-label" for="resp_3_3"><span class="opt-score">3</span><span class="opt-text">Puas</span></label>
+                                </div>
+                                <div class="likert-option opt-sp">
+                                    <input type="radio" id="resp_3_4" name="resp_3" value="4">
+                                    <label class="likert-label" for="resp_3_4"><span class="opt-score">4</span><span class="opt-text">Sangat Puas</span></label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="question-item">
+                            <p class="question-title">4. Kesigapan tim operasional dalam menangani kendala yang terjadi selama kegiatan bongkar muat berlangsung.</p>
+                            <div class="likert-grid">
+                                <div class="likert-option opt-tp">
+                                    <input type="radio" id="resp_4_1" name="resp_4" value="1" required>
+                                    <label class="likert-label" for="resp_4_1"><span class="opt-score">1</span><span class="opt-text">Tidak Puas</span></label>
+                                </div>
+                                <div class="likert-option opt-cp">
+                                    <input type="radio" id="resp_4_2" name="resp_4" value="2">
+                                    <label class="likert-label" for="resp_4_2"><span class="opt-score">2</span><span class="opt-text">Cukup Puas</span></label>
+                                </div>
+                                <div class="likert-option opt-p">
+                                    <input type="radio" id="resp_4_3" name="resp_4" value="3">
+                                    <label class="likert-label" for="resp_4_3"><span class="opt-score">3</span><span class="opt-text">Puas</span></label>
+                                </div>
+                                <div class="likert-option opt-sp">
+                                    <input type="radio" id="resp_4_4" name="resp_4" value="4">
+                                    <label class="likert-label" for="resp_4_4"><span class="opt-score">4</span><span class="opt-text">Sangat Puas</span></label>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- 2. DIMENSI JAMINAN DAN KEPASTIAN (ASSURANCE) -->
+                    <section class="dimension-card">
+                        <div class="dimension-header">
+                            <div class="dim-badge">B</div>
+                            <h2>2. Jaminan dan Kepastian (<i>Assurance</i>)</h2>
+                        </div>
+
+                        <div class="question-item">
+                            <p class="question-title">5. Kehati-hatian dan Profesionalisme petugas dalam menangani dan memindahkan barang untuk meminimalkan risiko kerusakan kargo (<i>zero damage</i>).</p>
+                            <div class="likert-grid">
+                                <div class="likert-option opt-tp">
+                                    <input type="radio" id="assu_1_1" name="assu_1" value="1" required>
+                                    <label class="likert-label" for="assu_1_1"><span class="opt-score">1</span><span class="opt-text">Tidak Puas</span></label>
+                                </div>
+                                <div class="likert-option opt-cp">
+                                    <input type="radio" id="assu_1_2" name="assu_1" value="2">
+                                    <label class="likert-label" for="assu_1_2"><span class="opt-score">2</span><span class="opt-text">Cukup Puas</span></label>
+                                </div>
+                                <div class="likert-option opt-p">
+                                    <input type="radio" id="assu_1_3" name="assu_1" value="3">
+                                    <label class="likert-label" for="assu_1_3"><span class="opt-score">3</span><span class="opt-text">Puas</span></label>
+                                </div>
+                                <div class="likert-option opt-sp">
+                                    <input type="radio" id="assu_1_4" name="assu_1" value="4">
+                                    <label class="likert-label" for="assu_1_4"><span class="opt-score">4</span><span class="opt-text">Sangat Puas</span></label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="question-item">
+                            <p class="question-title">6. Jaminan keamanan kargo, penerapan standar K3 di lapangan, serta kejelasan tanggung jawab/prosedur kerja.</p>
+                            <div class="likert-grid">
+                                <div class="likert-option opt-tp">
+                                    <input type="radio" id="assu_2_1" name="assu_2" value="1" required>
+                                    <label class="likert-label" for="assu_2_1"><span class="opt-score">1</span><span class="opt-text">Tidak Puas</span></label>
+                                </div>
+                                <div class="likert-option opt-cp">
+                                    <input type="radio" id="assu_2_2" name="assu_2" value="2">
+                                    <label class="likert-label" for="assu_2_2"><span class="opt-score">2</span><span class="opt-text">Cukup Puas</span></label>
+                                </div>
+                                <div class="likert-option opt-p">
+                                    <input type="radio" id="assu_2_3" name="assu_2" value="3">
+                                    <label class="likert-label" for="assu_2_3"><span class="opt-score">3</span><span class="opt-text">Puas</span></label>
+                                </div>
+                                <div class="likert-option opt-sp">
+                                    <input type="radio" id="assu_2_4" name="assu_2" value="4">
+                                    <label class="likert-label" for="assu_2_4"><span class="opt-score">4</span><span class="opt-text">Sangat Puas</span></label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="question-item">
+                            <p class="question-title">7. Keahlian dan kompetensi petugas serta operator lapangan sesuai standar sertifikasi operasional yang berlaku.</p>
+                            <div class="likert-grid">
+                                <div class="likert-option opt-tp">
+                                    <input type="radio" id="assu_3_1" name="assu_3" value="1" required>
+                                    <label class="likert-label" for="assu_3_1"><span class="opt-score">1</span><span class="opt-text">Tidak Puas</span></label>
+                                </div>
+                                <div class="likert-option opt-cp">
+                                    <input type="radio" id="assu_3_2" name="assu_3" value="2">
+                                    <label class="likert-label" for="assu_3_2"><span class="opt-score">2</span><span class="opt-text">Cukup Puas</span></label>
+                                </div>
+                                <div class="likert-option opt-p">
+                                    <input type="radio" id="assu_3_3" name="assu_3" value="3">
+                                    <label class="likert-label" for="assu_3_3"><span class="opt-score">3</span><span class="opt-text">Puas</span></label>
+                                </div>
+                                <div class="likert-option opt-sp">
+                                    <input type="radio" id="assu_3_4" name="assu_3" value="4">
+                                    <label class="likert-label" for="assu_3_4"><span class="opt-score">4</span><span class="opt-text">Sangat Puas</span></label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="question-item">
+                            <p class="question-title">8. Transparansi dan kesesuaian penagihan (<i>invoicing</i>) dengan tarif serta kesepakatan kerja awal.</p>
+                            <div class="likert-grid">
+                                <div class="likert-option opt-tp">
+                                    <input type="radio" id="assu_4_1" name="assu_4" value="1" required>
+                                    <label class="likert-label" for="assu_4_1"><span class="opt-score">1</span><span class="opt-text">Tidak Puas</span></label>
+                                </div>
+                                <div class="likert-option opt-cp">
+                                    <input type="radio" id="assu_4_2" name="assu_4" value="2">
+                                    <label class="likert-label" for="assu_4_2"><span class="opt-score">2</span><span class="opt-text">Cukup Puas</span></label>
+                                </div>
+                                <div class="likert-option opt-p">
+                                    <input type="radio" id="assu_4_3" name="assu_4" value="3">
+                                    <label class="likert-label" for="assu_4_3"><span class="opt-score">3</span><span class="opt-text">Puas</span></label>
+                                </div>
+                                <div class="likert-option opt-sp">
+                                    <input type="radio" id="assu_4_4" name="assu_4" value="4">
+                                    <label class="likert-label" for="assu_4_4"><span class="opt-score">4</span><span class="opt-text">Sangat Puas</span></label>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- 3. DIMENSI EMPATI (EMPATHY) -->
+                    <section class="dimension-card">
+                        <div class="dimension-header">
+                            <div class="dim-badge">C</div>
+                            <h2>3. Empati (<i>Empathy</i>)</h2>
+                        </div>
+
+                        <div class="question-item">
+                            <p class="question-title">9. Kemudahan pelanggan dalam menghubungi dan berkoordinasi dengan tim operasional maupun manajemen.</p>
+                            <div class="likert-grid">
+                                <div class="likert-option opt-tp">
+                                    <input type="radio" id="empa_1_1" name="empa_1" value="1" required>
+                                    <label class="likert-label" for="empa_1_1"><span class="opt-score">1</span><span class="opt-text">Tidak Puas</span></label>
+                                </div>
+                                <div class="likert-option opt-cp">
+                                    <input type="radio" id="empa_1_2" name="empa_1" value="2">
+                                    <label class="likert-label" for="empa_1_2"><span class="opt-score">2</span><span class="opt-text">Cukup Puas</span></label>
+                                </div>
+                                <div class="likert-option opt-p">
+                                    <input type="radio" id="empa_1_3" name="empa_1" value="3">
+                                    <label class="likert-label" for="empa_1_3"><span class="opt-score">3</span><span class="opt-text">Puas</span></label>
+                                </div>
+                                <div class="likert-option opt-sp">
+                                    <input type="radio" id="empa_1_4" name="empa_1" value="4">
+                                    <label class="likert-label" for="empa_1_4"><span class="opt-score">4</span><span class="opt-text">Sangat Puas</span></label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="question-item">
+                            <p class="question-title">10. Pemahaman petugas terhadap kebutuhan spesifik atau instruksi khusus pelanggan terkait karakteristik kargonya.</p>
+                            <div class="likert-grid">
+                                <div class="likert-option opt-tp">
+                                    <input type="radio" id="empa_2_1" name="empa_2" value="1" required>
+                                    <label class="likert-label" for="empa_2_1"><span class="opt-score">1</span><span class="opt-text">Tidak Puas</span></label>
+                                </div>
+                                <div class="likert-option opt-cp">
+                                    <input type="radio" id="empa_2_2" name="empa_2" value="2">
+                                    <label class="likert-label" for="empa_2_2"><span class="opt-score">2</span><span class="opt-text">Cukup Puas</span></label>
+                                </div>
+                                <div class="likert-option opt-p">
+                                    <input type="radio" id="empa_2_3" name="empa_2" value="3">
+                                    <label class="likert-label" for="empa_2_3"><span class="opt-score">3</span><span class="opt-text">Puas</span></label>
+                                </div>
+                                <div class="likert-option opt-sp">
+                                    <input type="radio" id="empa_2_4" name="empa_2" value="4">
+                                    <label class="likert-label" for="empa_2_4"><span class="opt-score">4</span><span class="opt-text">Sangat Puas</span></label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="question-item">
+                            <p class="question-title">11. Kepedulian dan kesediaan petugas dalam mendengarkan serta mencarikan solusi atas keluhan pelanggan.</p>
+                            <div class="likert-grid">
+                                <div class="likert-option opt-tp">
+                                    <input type="radio" id="empa_3_1" name="empa_3" value="1" required>
+                                    <label class="likert-label" for="empa_3_1"><span class="opt-score">1</span><span class="opt-text">Tidak Puas</span></label>
+                                </div>
+                                <div class="likert-option opt-cp">
+                                    <input type="radio" id="empa_3_2" name="empa_3" value="2">
+                                    <label class="likert-label" for="empa_3_2"><span class="opt-score">2</span><span class="opt-text">Cukup Puas</span></label>
+                                </div>
+                                <div class="likert-option opt-p">
+                                    <input type="radio" id="empa_3_3" name="empa_3" value="3">
+                                    <label class="likert-label" for="empa_3_3"><span class="opt-score">3</span><span class="opt-text">Puas</span></label>
+                                </div>
+                                <div class="likert-option opt-sp">
+                                    <input type="radio" id="empa_3_4" name="empa_3" value="4">
+                                    <label class="likert-label" for="empa_3_4"><span class="opt-score">4</span><span class="opt-text">Sangat Puas</span></label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="question-item">
+                            <p class="question-title">12. Sikap pelayanan petugas yang ramah, kooperatif, dan adil tanpa membeda-bedakan pelanggan.</p>
+                            <div class="likert-grid">
+                                <div class="likert-option opt-tp">
+                                    <input type="radio" id="empa_4_1" name="empa_4" value="1" required>
+                                    <label class="likert-label" for="empa_4_1"><span class="opt-score">1</span><span class="opt-text">Tidak Puas</span></label>
+                                </div>
+                                <div class="likert-option opt-cp">
+                                    <input type="radio" id="empa_4_2" name="empa_4" value="2">
+                                    <label class="likert-label" for="empa_4_2"><span class="opt-score">2</span><span class="opt-text">Cukup Puas</span></label>
+                                </div>
+                                <div class="likert-option opt-p">
+                                    <input type="radio" id="empa_4_3" name="empa_4" value="3">
+                                    <label class="likert-label" for="empa_4_3"><span class="opt-score">3</span><span class="opt-text">Puas</span></label>
+                                </div>
+                                <div class="likert-option opt-sp">
+                                    <input type="radio" id="empa_4_4" name="empa_4" value="4">
+                                    <label class="likert-label" for="empa_4_4"><span class="opt-score">4</span><span class="opt-text">Sangat Puas</span></label>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- 4. DIMENSI KEHANDALAN (RELIABILITY) -->
+                    <section class="dimension-card">
+                        <div class="dimension-header">
+                            <div class="dim-badge">D</div>
+                            <h2>4. Kehandalan (<i>Reliability</i>)</h2>
+                        </div>
+
+                        <div class="question-item">
+                            <p class="question-title">13. Ketepatan waktu pelaksanaan dan penyelesaian bongkar muat sesuai jadwal/target yang telah disepakati.</p>
+                            <div class="likert-grid">
+                                <div class="likert-option opt-tp">
+                                    <input type="radio" id="reli_1_1" name="reli_1" value="1" required>
+                                    <label class="likert-label" for="reli_1_1"><span class="opt-score">1</span><span class="opt-text">Tidak Puas</span></label>
+                                </div>
+                                <div class="likert-option opt-cp">
+                                    <input type="radio" id="reli_1_2" name="reli_1" value="2">
+                                    <label class="likert-label" for="reli_1_2"><span class="opt-score">2</span><span class="opt-text">Cukup Puas</span></label>
+                                </div>
+                                <div class="likert-option opt-p">
+                                    <input type="radio" id="reli_1_3" name="reli_1" value="3">
+                                    <label class="likert-label" for="reli_1_3"><span class="opt-score">3</span><span class="opt-text">Puas</span></label>
+                                </div>
+                                <div class="likert-option opt-sp">
+                                    <input type="radio" id="reli_1_4" name="reli_1" value="4">
+                                    <label class="likert-label" for="reli_1_4"><span class="opt-score">4</span><span class="opt-text">Sangat Puas</span></label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="question-item">
+                            <p class="question-title">14. Kecukupan jumlah personil lapangan (TKBM/operator) yang disediakan untuk mendukung kelancaran pekerjaan.</p>
+                            <div class="likert-grid">
+                                <div class="likert-option opt-tp">
+                                    <input type="radio" id="reli_2_1" name="reli_2" value="1" required>
+                                    <label class="likert-label" for="reli_2_1"><span class="opt-score">1</span><span class="opt-text">Tidak Puas</span></label>
+                                </div>
+                                <div class="likert-option opt-cp">
+                                    <input type="radio" id="reli_2_2" name="reli_2" value="2">
+                                    <label class="likert-label" for="reli_2_2"><span class="opt-score">2</span><span class="opt-text">Cukup Puas</span></label>
+                                </div>
+                                <div class="likert-option opt-p">
+                                    <input type="radio" id="reli_2_3" name="reli_2" value="3">
+                                    <label class="likert-label" for="reli_2_3"><span class="opt-score">3</span><span class="opt-text">Puas</span></label>
+                                </div>
+                                <div class="likert-option opt-sp">
+                                    <input type="radio" id="reli_2_4" name="reli_2" value="4">
+                                    <label class="likert-label" for="reli_2_4"><span class="opt-score">4</span><span class="opt-text">Sangat Puas</span></label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="question-item">
+                            <p class="question-title">15. Akurasi, kelengkapan, dan kejelasan dokumen atau laporan hasil kegiatan bongkar muat (<i>tally sheet</i>, <i>statement of facts</i>, dll.).</p>
+                            <div class="likert-grid">
+                                <div class="likert-option opt-tp">
+                                    <input type="radio" id="reli_3_1" name="reli_3" value="1" required>
+                                    <label class="likert-label" for="reli_3_1"><span class="opt-score">1</span><span class="opt-text">Tidak Puas</span></label>
+                                </div>
+                                <div class="likert-option opt-cp">
+                                    <input type="radio" id="reli_3_2" name="reli_3" value="2">
+                                    <label class="likert-label" for="reli_3_2"><span class="opt-score">2</span><span class="opt-text">Cukup Puas</span></label>
+                                </div>
+                                <div class="likert-option opt-p">
+                                    <input type="radio" id="reli_3_3" name="reli_3" value="3">
+                                    <label class="likert-label" for="reli_3_3"><span class="opt-score">3</span><span class="opt-text">Puas</span></label>
+                                </div>
+                                <div class="likert-option opt-sp">
+                                    <input type="radio" id="reli_3_4" name="reli_3" value="4">
+                                    <label class="likert-label" for="reli_3_4"><span class="opt-score">4</span><span class="opt-text">Sangat Puas</span></label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="question-item">
+                            <p class="question-title">16. Konsistensi kualitas layanan yang diberikan dari waktu ke waktu sesuai dengan komitmen awal (<i>Service Level Agreement</i>).</p>
+                            <div class="likert-grid">
+                                <div class="likert-option opt-tp">
+                                    <input type="radio" id="reli_4_1" name="reli_4" value="1" required>
+                                    <label class="likert-label" for="reli_4_1"><span class="opt-score">1</span><span class="opt-text">Tidak Puas</span></label>
+                                </div>
+                                <div class="likert-option opt-cp">
+                                    <input type="radio" id="reli_4_2" name="reli_4" value="2">
+                                    <label class="likert-label" for="reli_4_2"><span class="opt-score">2</span><span class="opt-text">Cukup Puas</span></label>
+                                </div>
+                                <div class="likert-option opt-p">
+                                    <input type="radio" id="reli_4_3" name="reli_4" value="3">
+                                    <label class="likert-label" for="reli_4_3"><span class="opt-score">3</span><span class="opt-text">Puas</span></label>
+                                </div>
+                                <div class="likert-option opt-sp">
+                                    <input type="radio" id="reli_4_4" name="reli_4" value="4">
+                                    <label class="likert-label" for="reli_4_4"><span class="opt-score">4</span><span class="opt-text">Sangat Puas</span></label>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- 5. DIMENSI BUKTI FISIK (TANGIBLE) -->
+                    <section class="dimension-card">
+                        <div class="dimension-header">
+                            <div class="dim-badge">E</div>
+                            <h2>5. Bukti Fisik (<i>Tangible</i>)</h2>
+                        </div>
+
+                        <div class="question-item">
+                            <p class="question-title">17. Kelengkapan, kesiapan, dan kondisi fasilitas alat angkat serta angkut (<i>crane</i>, <i>forklift</i>, <i>lifting gear</i>, dll.) dalam keadaan laik operasi.</p>
+                            <div class="likert-grid">
+                                <div class="likert-option opt-tp">
+                                    <input type="radio" id="tang_1_1" name="tang_1" value="1" required>
+                                    <label class="likert-label" for="tang_1_1"><span class="opt-score">1</span><span class="opt-text">Tidak Puas</span></label>
+                                </div>
+                                <div class="likert-option opt-cp">
+                                    <input type="radio" id="tang_1_2" name="tang_1" value="2">
+                                    <label class="likert-label" for="tang_1_2"><span class="opt-score">2</span><span class="opt-text">Cukup Puas</span></label>
+                                </div>
+                                <div class="likert-option opt-p">
+                                    <input type="radio" id="tang_1_3" name="tang_1" value="3">
+                                    <label class="likert-label" for="tang_1_3"><span class="opt-score">3</span><span class="opt-text">Puas</span></label>
+                                </div>
+                                <div class="likert-option opt-sp">
+                                    <input type="radio" id="tang_1_4" name="tang_1" value="4">
+                                    <label class="likert-label" for="tang_1_4"><span class="opt-score">4</span><span class="opt-text">Sangat Puas</span></label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="question-item">
+                            <p class="question-title">18. Kerapian seragam serta kelengkapan pemakaian Alat Pelindung Diri (APD) petugas lapangan sesuai standar keselamatan.</p>
+                            <div class="likert-grid">
+                                <div class="likert-option opt-tp">
+                                    <input type="radio" id="tang_2_1" name="tang_2" value="1" required>
+                                    <label class="likert-label" for="tang_2_1"><span class="opt-score">1</span><span class="opt-text">Tidak Puas</span></label>
+                                </div>
+                                <div class="likert-option opt-cp">
+                                    <input type="radio" id="tang_2_2" name="tang_2" value="2">
+                                    <label class="likert-label" for="tang_2_2"><span class="opt-score">2</span><span class="opt-text">Cukup Puas</span></label>
+                                </div>
+                                <div class="likert-option opt-p">
+                                    <input type="radio" id="tang_2_3" name="tang_2" value="3">
+                                    <label class="likert-label" for="tang_2_3"><span class="opt-score">3</span><span class="opt-text">Puas</span></label>
+                                </div>
+                                <div class="likert-option opt-sp">
+                                    <input type="radio" id="tang_2_4" name="tang_2" value="4">
+                                    <label class="likert-label" for="tang_2_4"><span class="opt-score">4</span><span class="opt-text">Sangat Puas</span></label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="question-item">
+                            <p class="question-title">19. Kerapian, kebersihan, dan ketertiban area kerja (dermaga/gudang) selama dan setelah kegiatan bongkar muat berlangsung.</p>
+                            <div class="likert-grid">
+                                <div class="likert-option opt-tp">
+                                    <input type="radio" id="tang_3_1" name="tang_3" value="1" required>
+                                    <label class="likert-label" for="tang_3_1"><span class="opt-score">1</span><span class="opt-text">Tidak Puas</span></label>
+                                </div>
+                                <div class="likert-option opt-cp">
+                                    <input type="radio" id="tang_3_2" name="tang_3" value="2">
+                                    <label class="likert-label" for="tang_3_2"><span class="opt-score">2</span><span class="opt-text">Cukup Puas</span></label>
+                                </div>
+                                <div class="likert-option opt-p">
+                                    <input type="radio" id="tang_3_3" name="tang_3" value="3">
+                                    <label class="likert-label" for="tang_3_3"><span class="opt-score">3</span><span class="opt-text">Puas</span></label>
+                                </div>
+                                <div class="likert-option opt-sp">
+                                    <input type="radio" id="tang_3_4" name="tang_3" value="4">
+                                    <label class="likert-label" for="tang_3_4"><span class="opt-score">4</span><span class="opt-text">Sangat Puas</span></label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="question-item">
+                            <p class="question-title">20. Kenyamanan fasilitas kantor operasional (ruang tamu, ruang rapat, dan area parkir) bagi pelanggan yang berkunjung.</p>
+                            <div class="likert-grid">
+                                <div class="likert-option opt-tp">
+                                    <input type="radio" id="tang_4_1" name="tang_4" value="1" required>
+                                    <label class="likert-label" for="tang_4_1"><span class="opt-score">1</span><span class="opt-text">Tidak Puas</span></label>
+                                </div>
+                                <div class="likert-option opt-cp">
+                                    <input type="radio" id="tang_4_2" name="tang_4" value="2">
+                                    <label class="likert-label" for="tang_4_2"><span class="opt-score">2</span><span class="opt-text">Cukup Puas</span></label>
+                                </div>
+                                <div class="likert-option opt-p">
+                                    <input type="radio" id="tang_4_3" name="tang_4" value="3">
+                                    <label class="likert-label" for="tang_4_3"><span class="opt-score">3</span><span class="opt-text">Puas</span></label>
+                                </div>
+                                <div class="likert-option opt-sp">
+                                    <input type="radio" id="tang_4_4" name="tang_4" value="4">
+                                    <label class="likert-label" for="tang_4_4"><span class="opt-score">4</span><span class="opt-text">Sangat Puas</span></label>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- SARAN DAN MASUKAN TERBUKA -->
+                    <div class="suggestion-box">
+                        <label for="saran_masukan">&#128172; Saran, Masukan, dan Apresiasi Terbuka</label>
+                        <p>Silakan sampaikan kritik, saran pengembangan fasilitas, atau catatan khusus demi peningkatan mutu layanan operasional bongkar muat (stevedoring) PT Kaltim Adhiguna Dermaga:</p>
+                        <textarea id="saran_masukan" name="saran_masukan" class="form-control" placeholder="Tuliskan saran dan masukan Anda di sini..."></textarea>
+                    </div>
+
+                    <div class="btn-action-group">
+                        <button type="button" class="btn-prev" onclick="goToStep(1)">&larr; Kembali ke Identitas</button>
+                        <button type="submit" class="btn-submit">&#10004; Kirim Penilaian Kuesioner Sekarang</button>
+                    </div>
+                </div>
+
+            </form>
+        </div>
+    </main>
+
+    <!-- 4. FOOTER RESMI (PELINDO CORPORATE STYLE) -->
+    <footer class="site-footer">
+        <div class="footer-container">
+            <div class="footer-brand">
+                <img src="assets/img/logo_kad.jpg" alt="Logo KAD" class="footer-logo">
+                <span class="footer-company">PT KALTIM ADHIGUNA DERMAGA</span>
+            </div>
+            <p class="footer-info">
+                Divisi Manajemen Operasional Pelabuhan &amp; Bongkar Muat (Stevedoring)<br>
+                Terminal Dermaga Pelabuhan, Kota Bontang, Kalimantan Timur &bull; Indonesia
+            </p>
+            <div class="footer-links">
+                <span>&copy; 2026 PT Kaltim Adhiguna Dermaga. Hak Cipta Dilindungi.</span>
+                <a href="login.php">&bull; Portal Admin</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- SCRIPT MULTI-STEP WIZARD -->
+    <script>
+        function goToStep(step) {
+            const step1 = document.getElementById('step-1');
+            const step2 = document.getElementById('step-2');
+            const progressFill = document.getElementById('progress-fill');
+            const stepTitleText = document.getElementById('step-title-text');
+            const stepBadgeText = document.getElementById('step-badge-text');
+            const stepCounterText = document.getElementById('step-counter-text');
+
+            if (step === 2) {
+                // Validasi data identitas responden sebelum lanjut
+                const nama = document.getElementById('nama_responden');
+                const perusahaan = document.getElementById('nama_perusahaan');
+                const alamat = document.getElementById('alamat_perusahaan');
+
+                if (!nama.value.trim()) {
+                    alert('Mohon isi Nama Lengkap Responden terlebih dahulu.');
+                    nama.focus();
+                    return;
+                }
+                if (!perusahaan.value.trim()) {
+                    alert('Mohon isi Nama Perusahaan / Agen Pelayaran terlebih dahulu.');
+                    perusahaan.focus();
+                    return;
+                }
+                if (!alamat.value.trim()) {
+                    alert('Mohon isi Alamat Perusahaan terlebih dahulu.');
+                    alamat.focus();
+                    return;
+                }
+
+                // Berpindah ke Jendela 2 (Kuesioner)
+                step1.style.display = 'none';
+                step2.style.display = 'block';
+                progressFill.style.width = '100%';
+                stepBadgeText.textContent = 'LANGKAH 2/2';
+                stepTitleText.textContent = 'Lembar Penilaian Kuesioner (20 Pertanyaan)';
+                stepCounterText.textContent = 'Tahap 2 dari 2';
+
+                // Hilangkan tombol Portal Admin di header saat berada di Halaman Kuesioner
+                const adminBtn = document.getElementById('nav-portal-admin');
+                if (adminBtn) adminBtn.style.display = 'none';
+            } else if (step === 1) {
+                // Kembali ke Jendela 1 (Identitas / Halaman Depan)
+                step2.style.display = 'none';
+                step1.style.display = 'block';
+                progressFill.style.width = '50%';
+                stepBadgeText.textContent = 'LANGKAH 1/2';
+                stepTitleText.textContent = 'Identitas Responden & Mitra Perusahaan';
+                stepCounterText.textContent = 'Tahap 1 dari 2';
+
+                // Tampilkan kembali tombol Portal Admin saat di Halaman Depan
+                const adminBtn = document.getElementById('nav-portal-admin');
+                if (adminBtn) adminBtn.style.display = 'inline-flex';
+            }
+
+            // Scroll halus ke atas form agar pengguna nyaman
+            document.getElementById('survey-top').scrollIntoView({ behavior: 'smooth' });
+        }
+    </script>
+
+</body>
+</html>
