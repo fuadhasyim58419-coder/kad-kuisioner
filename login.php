@@ -101,7 +101,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
         body {
             font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            background: linear-gradient(135deg, #0a2540 0%, #005b96 50%, #0088cc 100%);
+            background: linear-gradient(135deg, rgba(0, 45, 98, 0.92) 0%, rgba(0, 80, 140, 0.85) 55%, rgba(0, 140, 200, 0.76) 100%),
+                        url('assets/img/dermaga_kad.jpg') center/cover no-repeat fixed;
             min-height: 100vh;
             display: flex;
             align-items: center;
@@ -122,8 +123,23 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             background: linear-gradient(135deg, var(--primary-navy), var(--primary-blue));
             color: var(--white);
             padding: 28px 24px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
             text-align: center;
             border-bottom: 4px solid var(--gold);
+        }
+
+        .login-logo {
+            display: block;
+            height: 54px;
+            width: auto;
+            background: #ffffff;
+            padding: 5px 10px;
+            border-radius: 10px;
+            margin: 0 auto 12px;
+            object-fit: contain;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.18);
         }
 
         .company-badge {
@@ -255,7 +271,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
     <div class="login-card">
         <div class="login-header">
-            <img src="assets/img/logo_kad.jpg" alt="Logo PT KAD" style="height: 54px; background: #ffffff; padding: 4px 8px; border-radius: 8px; margin-bottom: 12px; object-fit: contain; box-shadow: 0 4px 10px rgba(0,0,0,0.15);">
+            <img src="assets/img/logo_kad.jpg" alt="Logo PT KAD" class="login-logo">
             <div class="company-badge">PT Kaltim Adhiguna Dermaga</div>
             <h2>Portal Admin Dashboard</h2>
             <p>Khusus Tim Manajemen & Evaluasi Kepuasan Pelanggan</p>
