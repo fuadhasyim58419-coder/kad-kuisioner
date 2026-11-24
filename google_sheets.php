@@ -298,4 +298,36 @@ class GoogleSheetsService {
             return [];
         }
     }
+
+    /**
+     * Menghapus seluruh baris data responden di Google Spreadsheet (Mulai baris 2 hingga akhir)
+     * Baris 1 (Header kolom) tetap dipertahankan agar struktur tabel tidak rusak.
+     */
+    public function hapusSemuaDataSurvei() {
+        if (empty($this->clientId) || empty($this->clientSecret) || empty($this->refreshToken)) {
+            throw new Exception("Kredensial Google Sheets API belum dikonfigurasi.");
+        }
+
+        $accessToken = $this->getAccessToken();
+        $range = urlencode("{$this->sheetName}!A2:AB");
+        $url = "https://sheets.googleapis.com/v4/spreadsheets/{$this->spreadsheetId}/values/{$range}:clear";
+
+        $res = $this->httpRequest(
+            $url,
+            'POST',
+            [
+                "Authorization: Bearer {$accessToken}",
+                "Content-Type: application/json"
+            ],
+            '{}'
+        );
+
+        if ($res['code'] !== 200) {
+            $result = json_decode($res['body'], true);
+            $msg = $result['error']['message'] ?? 'Gagal mengosongkan data di Google Sheets';
+            throw new Exception("Google Sheets API Error ({$res['code']}): " . $msg);
+        }
+
+        return true;
+    }
 }

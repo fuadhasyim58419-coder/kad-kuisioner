@@ -104,11 +104,37 @@ try {
 }
 
 // ----------------------------------------------------------------------------
-// FITUR RESET DATA PERCOBAAN (TRUNCATE TABLE) JIKA MYSQL TERHUBUNG
+// FITUR RESET DATA PERCOBAAN (MYSQL & GOOGLE SPREADSHEET)
 // ----------------------------------------------------------------------------
-if ($dbConnected && $_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action_reset']) && $_POST['action_reset'] === 'confirm') {
-    $conn->query("TRUNCATE TABLE survei_kepuasan");
-    header("Location: dashboard.php?msg=reset_ok");
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action_reset']) && $_POST['action_reset'] === 'confirm') {
+    $resetErrors = [];
+
+    // 1. Kosongkan tabel MySQL jika database terhubung
+    if ($dbConnected) {
+        if (!$conn->query("TRUNCATE TABLE survei_kepuasan")) {
+            $resetErrors[] = "MySQL: " . $conn->error;
+        }
+    }
+
+    // 2. Kosongkan baris data responden (A2:AB) di Google Spreadsheet (Header baris 1 tetap aman)
+    require_once __DIR__ . '/google_sheets.php';
+    try {
+        $sheetsService = new GoogleSheetsService();
+        $sheetsService->hapusSemuaDataSurvei();
+    } catch (Throwable $e) {
+        $resetErrors[] = $e->getMessage();
+        error_log("Gagal reset Google Sheets: " . $e->getMessage());
+    }
+
+    if (empty($resetErrors)) {
+        header("Location: dashboard.php?msg=reset_ok", true, 302);
+    } else {
+        $errParam = urlencode(implode(' | ', $resetErrors));
+        header("Location: dashboard.php?msg=reset_err&detail=" . $errParam, true, 302);
+    }
+    if (ob_get_level() > 0) {
+        @ob_end_clean();
+    }
     exit;
 }
 
@@ -1045,7 +1071,11 @@ if (isset($_GET['export']) && $_GET['export'] === 'csv') {
 
         <?php if (isset($_GET['msg']) && $_GET['msg'] === 'reset_ok'): ?>
             <div class="alert-banner">
-                <span>&#10004;</span> Seluruh data kuesioner berhasil dikosongkan! Dashboard kini siap menerima data survei baru.
+                <span>&#10004;</span> Seluruh data kuesioner (Database &amp; Google Spreadsheet) berhasil dikosongkan! Dashboard kini siap menerima data survei baru.
+            </div>
+        <?php elseif (isset($_GET['msg']) && $_GET['msg'] === 'reset_err'): ?>
+            <div class="alert-banner" style="background-color: #fef2f2; border-color: #fecaca; color: #991b1b;">
+                <span>&#9888;</span> Gagal menghapus sebagian/seluruh data: <?= htmlspecialchars($_GET['detail'] ?? 'Terjadi kesalahan sistem') ?>
             </div>
         <?php endif; ?>
 
@@ -1362,8 +1392,8 @@ if (isset($_GET['export']) && $_GET['export'] === 'csv') {
     <div id="modal-reset" class="modal-overlay">
         <div class="modal-box">
             <h3>&#9888; Konfirmasi Reset Data</h3>
-            <p>Apakah Anda yakin ingin <strong>menghapus seluruh data survei</strong> saat ini? Tindakan ini akan mengosongkan seluruh riwayat dan mengatur ulang perhitungan $N = 0$.</p>
-            <form method="POST" action="dashboard.php">
+            <p>Apakah Anda yakin ingin <strong>menghapus seluruh data survei</strong> saat ini? Tindakan ini akan mengosongkan seluruh riwayat (termasuk di Google Spreadsheet) dan mengatur ulang perhitungan <strong>N = 0</strong>.</p>
+            <form method="POST" action="dashboard.php" onsubmit="const btn=this.querySelector('button[type=submit]'); btn.disabled=true; btn.textContent='Menghapus data...';">
                 <input type="hidden" name="action_reset" value="confirm">
                 <div class="modal-actions">
                     <button type="button" onclick="closeResetModal()" class="btn btn-outline-white" style="color: #1e293b; border-color: #cbd5e1;">Batal</button>
