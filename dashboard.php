@@ -1,5 +1,6 @@
 <?php
 ob_start();
+@date_default_timezone_set('Asia/Makassar'); // WITA (Bontang, Kalimantan Timur)
 
 $is_https = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
     || (($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '') === 'https');
@@ -103,34 +104,74 @@ try {
     $dbConnected = false;
 }
 
-// ----------------------------------------------------------------------------
-// FITUR RESET DATA PERCOBAAN (MYSQL & GOOGLE SPREADSHEET)
-// ----------------------------------------------------------------------------
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action_reset']) && $_POST['action_reset'] === 'confirm') {
-    $resetErrors = [];
+// ============================================================================
+// KONFIGURASI SHEET TAHUNAN OTOMATIS ("Data Responden YYYY") & GOOGLE SHEETS
+// ============================================================================
+require_once __DIR__ . '/google_sheets.php';
 
-    // 1. Kosongkan tabel MySQL jika database terhubung
-    if ($dbConnected) {
+$defaultYearlySheet = GoogleSheetsService::getDefaultYearlySheetName(); // misal: "Data Responden 2026"
+$requestedSheet = trim((string)($_GET['sheet'] ?? $_POST['target_sheet'] ?? ''));
+$activeSheet = $requestedSheet !== '' ? $requestedSheet : $defaultYearlySheet;
+
+$sheetsService = new GoogleSheetsService($activeSheet);
+$availableSheets = [];
+
+try {
+    // Pastikan tab tahun berjalan ("Data Responden YYYY") otomatis tersedia di Google Sheets
+    $sheetsService->pastikanSheetTersedia($defaultYearlySheet);
+    $availableSheets = $sheetsService->daftarSemuaSheet();
+} catch (Throwable $e) {
+    error_log("Google Sheets init notice: " . $e->getMessage());
+}
+
+if (empty($availableSheets)) {
+    $availableSheets = [$defaultYearlySheet];
+} elseif (!in_array($activeSheet, $availableSheets, true)) {
+    $availableSheets[] = $activeSheet;
+}
+
+// ----------------------------------------------------------------------------
+// FITUR RESET / ARSIPKAN DATA PERCOBAAN (MYSQL & GOOGLE SPREADSHEET)
+// ----------------------------------------------------------------------------
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action_reset']) && in_array($_POST['action_reset'], ['confirm', 'hard_reset', 'archive_reset'], true)) {
+    $mode = $_POST['action_reset'];
+    $targetSheet = trim((string)($_POST['target_sheet'] ?? $activeSheet)) ?: $defaultYearlySheet;
+    $resetErrors = [];
+    $archivedName = null;
+
+    $targetService = new GoogleSheetsService($targetSheet);
+
+    try {
+        if ($mode === 'archive_reset') {
+            $resArchive = $targetService->arsipkanDanResetData();
+            $archivedName = $resArchive['archiveName'] ?? null;
+        } else {
+            $targetService->hapusSemuaDataSurvei();
+        }
+    } catch (Throwable $e) {
+        $resetErrors[] = $e->getMessage();
+        error_log("Gagal reset/arsip Google Sheets: " . $e->getMessage());
+    }
+
+    // Kosongkan tabel MySQL lokal juga jika terhubung & sedang mereset tab tahun berjalan
+    if ($dbConnected && $targetSheet === $defaultYearlySheet) {
         if (!$conn->query("TRUNCATE TABLE survei_kepuasan")) {
             $resetErrors[] = "MySQL: " . $conn->error;
         }
     }
 
-    // 2. Kosongkan baris data responden (A2:AB) di Google Spreadsheet (Header baris 1 tetap aman)
-    require_once __DIR__ . '/google_sheets.php';
-    try {
-        $sheetsService = new GoogleSheetsService();
-        $sheetsService->hapusSemuaDataSurvei();
-    } catch (Throwable $e) {
-        $resetErrors[] = $e->getMessage();
-        error_log("Gagal reset Google Sheets: " . $e->getMessage());
-    }
-
+    $sheetParam = urlencode($targetSheet);
     if (empty($resetErrors)) {
-        header("Location: dashboard.php?msg=reset_ok", true, 302);
+        if ($mode === 'archive_reset' && $archivedName) {
+            header("Location: dashboard.php?sheet={$sheetParam}&msg=archive_ok&archive=" . urlencode($archivedName), true, 302);
+        } elseif ($mode === 'archive_reset' && !$archivedName) {
+            header("Location: dashboard.php?sheet={$sheetParam}&msg=archive_empty", true, 302);
+        } else {
+            header("Location: dashboard.php?sheet={$sheetParam}&msg=reset_ok", true, 302);
+        }
     } else {
         $errParam = urlencode(implode(' | ', $resetErrors));
-        header("Location: dashboard.php?msg=reset_err&detail=" . $errParam, true, 302);
+        header("Location: dashboard.php?sheet={$sheetParam}&msg=reset_err&detail=" . $errParam, true, 302);
     }
     if (ob_get_level() > 0) {
         @ob_end_clean();
@@ -158,39 +199,35 @@ function getRatingScale($percent) {
 }
 
 // ----------------------------------------------------------------------------
-// AMBIL SEMUA DATA RESPONDEN (DARI MYSQL ATAU GOOGLE SPREADSHEET LIVE)
+// AMBIL SEMUA DATA RESPONDEN (UTAMA: GOOGLE SPREADSHEET TAB AKTIF, FALLBACK MYSQL)
 // ----------------------------------------------------------------------------
 $rows = [];
 $dataSource = "";
+$sheetsLoaded = false;
 
-if ($dbConnected) {
+try {
+    $sheetRows = $sheetsService->ambilSemuaDataSurvei();
+    $rows = $sheetRows;
+    $sheetsLoaded = true;
+    $dataSource = "Google Sheets: " . $activeSheet;
+} catch (Throwable $e) {
+    error_log("Gagal membaca Google Sheets: " . $e->getMessage());
+}
+
+// Fallback ke MySQL lokal jika Google Sheets offline dan sedang membuka tab tahun berjalan
+if (!$sheetsLoaded && $dbConnected && $activeSheet === $defaultYearlySheet) {
     $query = "SELECT * FROM survei_kepuasan ORDER BY id ASC";
     $result = $conn->query($query);
     if ($result && $result->num_rows > 0) {
         while ($r = $result->fetch_assoc()) {
             $rows[] = $r;
         }
-        $dataSource = "MySQL Database";
-    }
-}
-
-// Fallback otomatis jika database offline/kosong (seperti di Vercel Serverless)
-if (empty($rows)) {
-    require_once __DIR__ . '/google_sheets.php';
-    try {
-        $sheetsService = new GoogleSheetsService();
-        $sheetRows = $sheetsService->ambilSemuaDataSurvei();
-        if (!empty($sheetRows)) {
-            $rows = $sheetRows;
-            $dataSource = "Google Spreadsheet (Live Cloud API)";
-        }
-    } catch (Throwable $e) {
-        error_log("Gagal membaca Google Sheets: " . $e->getMessage());
+        $dataSource = "MySQL Database (Lokal)";
     }
 }
 
 if (empty($dataSource)) {
-    $dataSource = $dbConnected ? "MySQL (Belum Ada Data)" : "Google Spreadsheet (Belum Ada Data)";
+    $dataSource = "Google Sheets: " . $activeSheet;
 }
 
 // Jumlah total responden dinamis (N)
@@ -291,14 +328,16 @@ foreach ($dimensionMap as $dimName => $indices) {
 // FITUR EKSPOR EXCEL (CSV) SESUAI STRUKTUR LAPORAN PERUSAHAAN
 // ----------------------------------------------------------------------------
 if (isset($_GET['export']) && $_GET['export'] === 'csv') {
+    $safeSheetSlug = preg_replace('/[^A-Za-z0-9_\-]+/', '_', $activeSheet);
     header('Content-Type: text/csv; charset=utf-8');
-    header('Content-Disposition: attachment; filename=Laporan_Kepuasan_Pelanggan_PT_KAD_' . date('Ymd_His') . '.csv');
+    header('Content-Disposition: attachment; filename=Laporan_Kepuasan_Pelanggan_PT_KAD_' . $safeSheetSlug . '_' . date('Ymd_His') . '.csv');
     echo "\xEF\xBB\xBF";
 
     $output = fopen('php://output', 'w');
 
     fputcsv($output, ['HASIL ANGKET KUISIONER KEPUASAN PELANGGAN'], ';');
     fputcsv($output, ['PT. KALTIM ADHIGUNA DERMAGA'], ';');
+    fputcsv($output, ['Periode / Tab Data', ': ' . $activeSheet], ';');
     fputcsv($output, [], ';');
     fputcsv($output, ['Jumlah Responden', ': ' . $N . ' Perusahaan'], ';');
     fputcsv($output, ['Jumlah Kuisioner yang kembali', ': ' . $N . ' Angket'], ';');
@@ -810,7 +849,7 @@ if (isset($_GET['export']) && $_GET['export'] === 'csv') {
                 padding-bottom: 0;
             }
 
-            .navbar, .nav-actions, .alert-banner, .btn, .modal-overlay {
+            .navbar, .nav-actions, .alert-banner, .btn, .modal-overlay, .period-selector-bar {
                 display: none !important;
             }
 
@@ -869,8 +908,102 @@ if (isset($_GET['export']) && $_GET['export'] === 'csv') {
             gap: 16px;
         }
 
+        /* Bar Pemilih Periode / Tab Tahun Google Sheets */
+        .period-selector-bar {
+            background: var(--white);
+            border: 1px solid var(--border-color);
+            border-left: 5px solid var(--primary-blue);
+            border-radius: 12px;
+            padding: 14px 20px;
+            margin-bottom: 22px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+        }
+
+        .period-selector-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .period-selector-label {
+            font-size: 0.88rem;
+            font-weight: 800;
+            color: var(--primary-navy);
+        }
+
+        .period-select {
+            padding: 9px 14px;
+            border: 1.5px solid #cbd5e1;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: var(--primary-navy);
+            background-color: #f8fafc;
+            cursor: pointer;
+            min-width: 220px;
+        }
+
+        .period-select:focus {
+            outline: none;
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 3px rgba(0, 91, 150, 0.14);
+        }
+
+        .period-hint {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        .modal-reset-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .modal-reset-actions .btn {
+            width: 100%;
+            justify-content: center;
+            padding: 12px 16px;
+            font-size: 0.9rem;
+        }
+
+        .btn-archive {
+            background: linear-gradient(135deg, #005b96, #0284c7);
+            color: #ffffff;
+        }
+
+        .btn-archive:hover {
+            background: linear-gradient(135deg, #0a2540, #005b96);
+        }
+
         /* RESPONSIVE MOBILE STYLES (PORTAL ADMIN) */
         @media (max-width: 768px) {
+            .period-selector-bar {
+                padding: 14px;
+                margin-bottom: 16px;
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .period-selector-left {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 8px;
+            }
+
+            .period-select {
+                width: 100%;
+                min-width: 0;
+                font-size: 16px;
+            }
             body {
                 padding-bottom: 32px;
             }
@@ -1047,7 +1180,7 @@ if (isset($_GET['export']) && $_GET['export'] === 'csv') {
     <div class="print-header">
         <h2 style="font-size: 1.3rem; margin-bottom: 2px;">PT KALTIM ADHIGUNA DERMAGA</h2>
         <h3 style="font-size: 1.1rem; font-weight: normal; margin-bottom: 4px;">LAPORAN HASIL ANGKET KUESIONER KEPUASAN PELANGGAN (STEVEDORING)</h3>
-        <p style="font-size: 0.85rem; color: #555;">Dokumen Resmi Hasil Penilaian Pelayanan Operasional Bongkar Muat</p>
+        <p style="font-size: 0.85rem; color: #555;">Periode / Lembar Data: <strong><?= htmlspecialchars($activeSheet) ?></strong> &bull; Dokumen Resmi Hasil Penilaian Pelayanan Operasional Bongkar Muat</p>
     </div>
 
     <!-- Header Navbar Layar -->
@@ -1061,21 +1194,46 @@ if (isset($_GET['export']) && $_GET['export'] === 'csv') {
         </div>
         <div class="nav-actions">
             <button onclick="window.print()" class="btn btn-print" title="Cetak atau Simpan ke PDF">&#128424; Cetak / Simpan PDF</button>
-            <a href="dashboard.php?export=csv" class="btn btn-gold" title="Ekspor data ke file Excel CSV">&#128190; Ekspor Excel (CSV)</a>
-            <button onclick="openResetModal()" class="btn btn-danger-outline" title="Kosongkan data kuesioner">&#128465; Reset Data Uji</button>
+            <a href="dashboard.php?export=csv&sheet=<?= urlencode($activeSheet) ?>" class="btn btn-gold" title="Ekspor data periode aktif ke file Excel CSV">&#128190; Ekspor Excel (CSV)</a>
+            <button onclick="openResetModal()" class="btn btn-danger-outline" title="Arsipkan atau kosongkan data tab aktif">&#128465; Arsip / Reset</button>
             <a href="dashboard.php?action=logout" class="btn btn-outline-white" title="Keluar dari portal">&#128274; Keluar</a>
         </div>
     </header>
 
     <main class="main-container">
 
-        <?php if (isset($_GET['msg']) && $_GET['msg'] === 'reset_ok'): ?>
+        <!-- Bar Pemilih Periode Tahunan / Tab Google Spreadsheet -->
+        <section class="period-selector-bar">
+            <form method="GET" action="dashboard.php" class="period-selector-left">
+                <label for="sheet-selector" class="period-selector-label">&#128197; Pilih Periode / Tab Data:</label>
+                <select id="sheet-selector" name="sheet" class="period-select" onchange="this.form.submit()">
+                    <?php foreach ($availableSheets as $sheetTitle): ?>
+                        <option value="<?= htmlspecialchars($sheetTitle) ?>" <?= ($sheetTitle === $activeSheet) ? 'selected' : '' ?>>
+                            <?= htmlspecialchars($sheetTitle) ?><?= ($sheetTitle === $defaultYearlySheet) ? ' (Tahun Berjalan)' : '' ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+            </form>
+            <div class="period-hint">
+                &#128202; Jawaban responden baru tahun <?= date('Y') ?> otomatis masuk ke tab <strong><?= htmlspecialchars($defaultYearlySheet) ?></strong>
+            </div>
+        </section>
+
+        <?php if (isset($_GET['msg']) && $_GET['msg'] === 'archive_ok'): ?>
             <div class="alert-banner">
-                <span>&#10004;</span> Seluruh data kuesioner (Database &amp; Google Spreadsheet) berhasil dikosongkan! Dashboard kini siap menerima data survei baru.
+                <span>&#10004;</span> Data berhasil diarsipkan ke tab baru <strong><?= htmlspecialchars($_GET['archive'] ?? 'Arsip') ?></strong> dan tab <strong><?= htmlspecialchars($activeSheet) ?></strong> kini kosong (N = 0).
+            </div>
+        <?php elseif (isset($_GET['msg']) && $_GET['msg'] === 'archive_empty'): ?>
+            <div class="alert-banner" style="background-color: #fffbeb; border-color: #fde68a; color: #92400e;">
+                <span>&#8505;&#65039;</span> Tab <strong><?= htmlspecialchars($activeSheet) ?></strong> sudah kosong, sehingga tidak ada data yang perlu diarsipkan.
+            </div>
+        <?php elseif (isset($_GET['msg']) && $_GET['msg'] === 'reset_ok'): ?>
+            <div class="alert-banner">
+                <span>&#10004;</span> Seluruh data kuesioner pada tab <strong><?= htmlspecialchars($activeSheet) ?></strong> berhasil dikosongkan! Dashboard kini siap menerima data survei baru.
             </div>
         <?php elseif (isset($_GET['msg']) && $_GET['msg'] === 'reset_err'): ?>
             <div class="alert-banner" style="background-color: #fef2f2; border-color: #fecaca; color: #991b1b;">
-                <span>&#9888;</span> Gagal menghapus sebagian/seluruh data: <?= htmlspecialchars($_GET['detail'] ?? 'Terjadi kesalahan sistem') ?>
+                <span>&#9888;</span> Gagal memproses reset/arsip: <?= htmlspecialchars($_GET['detail'] ?? 'Terjadi kesalahan sistem') ?>
             </div>
         <?php endif; ?>
 
@@ -1388,18 +1546,26 @@ if (isset($_GET['export']) && $_GET['export'] === 'csv') {
 
     </main>
 
-    <!-- Dialog Konfirmasi Reset Data -->
+    <!-- Dialog Konfirmasi Arsip / Reset Data -->
     <div id="modal-reset" class="modal-overlay">
         <div class="modal-box">
-            <h3>&#9888; Konfirmasi Reset Data</h3>
-            <p>Apakah Anda yakin ingin <strong>menghapus seluruh data survei</strong> saat ini? Tindakan ini akan mengosongkan seluruh riwayat (termasuk di Google Spreadsheet) dan mengatur ulang perhitungan <strong>N = 0</strong>.</p>
-            <form method="POST" action="dashboard.php" onsubmit="const btn=this.querySelector('button[type=submit]'); btn.disabled=true; btn.textContent='Menghapus data...';">
-                <input type="hidden" name="action_reset" value="confirm">
-                <div class="modal-actions">
-                    <button type="button" onclick="closeResetModal()" class="btn btn-outline-white" style="color: #1e293b; border-color: #cbd5e1;">Batal</button>
-                    <button type="submit" class="btn" style="background-color: var(--red); color: #fff;">Ya, Hapus Semua Data</button>
-                </div>
-            </form>
+            <h3 style="color: var(--primary-navy);">&#128193; Arsip / Reset Data Survei</h3>
+            <p style="margin-bottom: 14px;">Tab yang sedang aktif: <strong><?= htmlspecialchars($activeSheet) ?></strong> (<?= number_format($N) ?> responden).<br>Pilih tindakan yang Anda inginkan:</p>
+            <div class="modal-reset-actions">
+                <form method="POST" action="dashboard.php?sheet=<?= urlencode($activeSheet) ?>" onsubmit="disableModalButtons(this, 'Mengarsipkan & mengosongkan...');">
+                    <input type="hidden" name="action_reset" value="archive_reset">
+                    <input type="hidden" name="target_sheet" value="<?= htmlspecialchars($activeSheet) ?>">
+                    <button type="submit" class="btn btn-archive">&#128230; Arsipkan ke Tab Baru &amp; Kosongkan (Aman)</button>
+                </form>
+
+                <form method="POST" action="dashboard.php?sheet=<?= urlencode($activeSheet) ?>" onsubmit="if(!confirm('Yakin hapus permanen seluruh data di tab <?= htmlspecialchars(addslashes($activeSheet)) ?> tanpa arsip?')) return false; disableModalButtons(this, 'Menghapus permanen...');">
+                    <input type="hidden" name="action_reset" value="hard_reset">
+                    <input type="hidden" name="target_sheet" value="<?= htmlspecialchars($activeSheet) ?>">
+                    <button type="submit" class="btn" style="background-color: var(--red); color: #fff;">&#128465; Hapus Permanen (Khusus Data Uji)</button>
+                </form>
+
+                <button type="button" onclick="closeResetModal()" class="btn btn-outline-white" style="color: #1e293b; border-color: #cbd5e1;">Batal</button>
+            </div>
         </div>
     </div>
 
@@ -1409,6 +1575,12 @@ if (isset($_GET['export']) && $_GET['export'] === 'csv') {
         }
         function closeResetModal() {
             document.getElementById('modal-reset').classList.remove('active');
+        }
+        function disableModalButtons(form, loadingText) {
+            const buttons = document.querySelectorAll('#modal-reset button');
+            buttons.forEach(b => b.disabled = true);
+            const submitBtn = form.querySelector('button[type="submit"]');
+            if (submitBtn) submitBtn.textContent = loadingText;
         }
         function toggleQuestionsList() {
             const body = document.getElementById('questions-list-body');

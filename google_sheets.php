@@ -2,8 +2,14 @@
 // ============================================================================
 // HELPER INTEGRASI GOOGLE SHEETS API (NATIVE PHP STREAM / cURL)
 // PT Kaltim Adhiguna Dermaga
-// Mendukung Localhost (XAMPP) & Cloud Serverless (Vercel)
+// Mendukung Tab Tahunan Otomatis ("Data Responden YYYY"), Arsip, & Cloud Vercel
 // ============================================================================
+
+if (!ini_get('date.timezone')) {
+    date_default_timezone_set('Asia/Makassar'); // WITA (Bontang, Kalimantan Timur)
+} else {
+    @date_default_timezone_set('Asia/Makassar');
+}
 
 class GoogleSheetsService {
     private $clientId;
@@ -11,8 +17,18 @@ class GoogleSheetsService {
     private $refreshToken;
     private $spreadsheetId;
     private $sheetName;
+    private $cachedAccessToken = null;
+    private $cachedSheetsMap = null;
 
-    public function __construct() {
+    /**
+     * Menghasilkan nama tab tahunan otomatis, misal: "Data Responden 2026", "Data Responden 2027", dst.
+     */
+    public static function getDefaultYearlySheetName($year = null) {
+        $targetYear = $year ?: date('Y');
+        return 'Data Responden ' . $targetYear;
+    }
+
+    public function __construct($customSheetName = null) {
         // Coba load file .env jika ada (misal di localhost / XAMPP)
         $envPaths = [
             __DIR__ . '/.env',
@@ -38,12 +54,27 @@ class GoogleSheetsService {
             }
         }
 
-        // Ambil dari Environment Variables (Vercel / System / .env lokal)
+        // Ambil kredensial dari Environment Variables (Vercel / System / .env lokal)
         $this->clientId      = getenv('GOOGLE_CLIENT_ID') ?: ($_ENV['GOOGLE_CLIENT_ID'] ?? '');
         $this->clientSecret  = getenv('GOOGLE_CLIENT_SECRET') ?: ($_ENV['GOOGLE_CLIENT_SECRET'] ?? '');
         $this->refreshToken  = getenv('GOOGLE_REFRESH_TOKEN') ?: ($_ENV['GOOGLE_REFRESH_TOKEN'] ?? '');
         $this->spreadsheetId = getenv('GOOGLE_SPREADSHEET_ID') ?: ($_ENV['GOOGLE_SPREADSHEET_ID'] ?? '');
-        $this->sheetName     = getenv('GOOGLE_SHEET_NAME') ?: ($_ENV['GOOGLE_SHEET_NAME'] ?? 'Sheet1');
+
+        // Gunakan nama sheet khusus jika dipilih (misal di Dashboard), atau otomatis "Data Responden YYYY"
+        $custom = trim((string)($customSheetName ?? ''));
+        $this->sheetName = $custom !== '' ? $custom : self::getDefaultYearlySheetName();
+    }
+
+    public function getSheetName() {
+        return $this->sheetName;
+    }
+
+    /**
+     * Mengamankan nama sheet yang mengandung spasi/tanda kurung dalam notasi A1 Google Sheets
+     */
+    private function formatA1Range($sheetName, $cellRange) {
+        $escaped = str_replace("'", "''", $sheetName);
+        return "'{$escaped}'!{$cellRange}";
     }
 
     /**
@@ -106,6 +137,10 @@ class GoogleSheetsService {
      * Mendapatkan Access Token baru dari Google menggunakan Refresh Token
      */
     private function getAccessToken() {
+        if ($this->cachedAccessToken !== null) {
+            return $this->cachedAccessToken;
+        }
+
         $tokenUrl = 'https://oauth2.googleapis.com/token';
 
         $postData = http_build_query([
@@ -125,7 +160,8 @@ class GoogleSheetsService {
         $data = json_decode($res['body'], true);
 
         if ($res['code'] === 200 && isset($data['access_token'])) {
-            return $data['access_token'];
+            $this->cachedAccessToken = $data['access_token'];
+            return $this->cachedAccessToken;
         }
 
         $err = $data['error_description'] ?? $data['error'] ?? 'Gagal mendapatkan access token';
@@ -133,10 +169,120 @@ class GoogleSheetsService {
     }
 
     /**
-     * Memastikan header kolom ada jika spreadsheet masih kosong
+     * Mengambil peta seluruh tab sheet di Spreadsheet: ['Nama Tab' => sheetId]
+     */
+    private function getSheetsMap($accessToken, $forceRefresh = false) {
+        if ($this->cachedSheetsMap !== null && !$forceRefresh) {
+            return $this->cachedSheetsMap;
+        }
+
+        $url = "https://sheets.googleapis.com/v4/spreadsheets/{$this->spreadsheetId}?fields=sheets.properties(sheetId,title)";
+        $res = $this->httpRequest(
+            $url,
+            'GET',
+            ["Authorization: Bearer {$accessToken}"]
+        );
+
+        if ($res['code'] !== 200) {
+            $data = json_decode($res['body'], true);
+            $msg = $data['error']['message'] ?? 'Gagal mengambil daftar tab Google Sheets';
+            throw new Exception("Google Sheets Metadata Error ({$res['code']}): " . $msg);
+        }
+
+        $data = json_decode($res['body'], true);
+        $map = [];
+        foreach (($data['sheets'] ?? []) as $sheet) {
+            if (isset($sheet['properties']['title'])) {
+                $map[$sheet['properties']['title']] = (int)$sheet['properties']['sheetId'];
+            }
+        }
+
+        $this->cachedSheetsMap = $map;
+        return $map;
+    }
+
+    /**
+     * Mengembalikan daftar nama semua tab yang tersedia di Google Spreadsheet
+     */
+    public function daftarSemuaSheet() {
+        if (empty($this->clientId) || empty($this->clientSecret) || empty($this->refreshToken) || empty($this->spreadsheetId)) {
+            return [$this->sheetName];
+        }
+
+        try {
+            $accessToken = $this->getAccessToken();
+            $map = $this->getSheetsMap($accessToken);
+            return array_keys($map);
+        } catch (Throwable $e) {
+            error_log("Gagal membaca daftar sheet: " . $e->getMessage());
+            return [$this->sheetName];
+        }
+    }
+
+    /**
+     * Memastikan tab tahunan/tujuan sudah ada di Google Spreadsheet.
+     * Jika belum ada (misal ganti tahun ke 2027), otomatis dibuatkan tab baru beserta header kolomnya.
+     */
+    public function pastikanSheetTersedia($sheetName = null) {
+        $target = $sheetName ?: $this->sheetName;
+        $accessToken = $this->getAccessToken();
+        return $this->ensureSheetExists($accessToken, $target);
+    }
+
+    private function ensureSheetExists($accessToken, $sheetName) {
+        $map = $this->getSheetsMap($accessToken);
+        if (isset($map[$sheetName])) {
+            return $map[$sheetName];
+        }
+
+        // Buat tab baru via batchUpdate (addSheet)
+        $url = "https://sheets.googleapis.com/v4/spreadsheets/{$this->spreadsheetId}:batchUpdate";
+        $payload = json_encode([
+            'requests' => [
+                [
+                    'addSheet' => [
+                        'properties' => [
+                            'title' => $sheetName
+                        ]
+                    ]
+                ]
+            ]
+        ]);
+
+        $res = $this->httpRequest(
+            $url,
+            'POST',
+            [
+                "Authorization: Bearer {$accessToken}",
+                "Content-Type: application/json"
+            ],
+            $payload
+        );
+
+        $data = json_decode($res['body'], true);
+        if ($res['code'] !== 200) {
+            $msg = $data['error']['message'] ?? "Gagal membuat tab baru '{$sheetName}'";
+            throw new Exception("Google Sheets API Error ({$res['code']}): " . $msg);
+        }
+
+        $newId = (int)($data['replies'][0]['addSheet']['properties']['sheetId'] ?? 0);
+        $this->cachedSheetsMap[$sheetName] = $newId;
+
+        // Pastikan baris header otomatis tertulis di tab baru
+        $prevSheet = $this->sheetName;
+        $this->sheetName = $sheetName;
+        $this->ensureHeaderExists($accessToken);
+        $this->sheetName = $prevSheet;
+
+        return $newId;
+    }
+
+    /**
+     * Memastikan header kolom ada jika tab spreadsheet masih kosong
      */
     private function ensureHeaderExists($accessToken) {
-        $range = urlencode("{$this->sheetName}!A1:Z1");
+        $a1 = $this->formatA1Range($this->sheetName, 'A1:AB1');
+        $range = urlencode($a1);
         $checkUrl = "https://sheets.googleapis.com/v4/spreadsheets/{$this->spreadsheetId}/values/{$range}";
 
         $res = $this->httpRequest(
@@ -164,11 +310,12 @@ class GoogleSheetsService {
      * Mengirimkan satu baris data ke Google Spreadsheet
      */
     private function appendRowData($accessToken, $rowValues) {
-        $range = urlencode("{$this->sheetName}!A1");
+        $a1 = $this->formatA1Range($this->sheetName, 'A1');
+        $range = urlencode($a1);
         $url = "https://sheets.googleapis.com/v4/spreadsheets/{$this->spreadsheetId}/values/{$range}:append?valueInputOption=USER_ENTERED&insertDataOption=INSERT_ROWS";
 
         $payload = json_encode([
-            'range'          => "{$this->sheetName}!A1",
+            'range'          => $a1,
             'majorDimension' => 'ROWS',
             'values'         => [$rowValues]
         ]);
@@ -193,7 +340,7 @@ class GoogleSheetsService {
     }
 
     /**
-     * Fungsi publik untuk mengirim data survei langsung ke Google Sheets
+     * Fungsi publik untuk mengirim data survei langsung ke tab tahun berjalan ("Data Responden YYYY")
      */
     public function kirimDataSurvei($surveyData) {
         if (empty($this->clientSecret) || $this->clientSecret === 'MASUKKAN_CLIENT_SECRET_ANDA_DISINI') {
@@ -201,6 +348,7 @@ class GoogleSheetsService {
         }
 
         $accessToken = $this->getAccessToken();
+        $this->ensureSheetExists($accessToken, $this->sheetName);
         $this->ensureHeaderExists($accessToken);
 
         $totalSkor = 0;
@@ -234,17 +382,17 @@ class GoogleSheetsService {
     }
 
     /**
-     * Membaca semua baris data survei dari Google Spreadsheet (Mulai baris 2 hingga akhir)
-     * Digunakan sebagai data source otomatis pada Dashboard jika MySQL offline (misal di Vercel)
+     * Membaca semua baris data survei dari tab yang aktif (Mulai baris 2 hingga akhir)
      */
     public function ambilSemuaDataSurvei() {
-        if (empty($this->clientId) || empty($this->clientSecret) || empty($this->refreshToken)) {
+        if (empty($this->clientId) || empty($this->clientSecret) || empty($this->refreshToken) || empty($this->spreadsheetId)) {
             return [];
         }
 
         try {
             $accessToken = $this->getAccessToken();
-            $range = urlencode("{$this->sheetName}!A2:AB");
+            $a1 = $this->formatA1Range($this->sheetName, 'A2:AB');
+            $range = urlencode($a1);
             $url = "https://sheets.googleapis.com/v4/spreadsheets/{$this->spreadsheetId}/values/{$range}";
 
             $res = $this->httpRequest(
@@ -300,16 +448,82 @@ class GoogleSheetsService {
     }
 
     /**
-     * Menghapus seluruh baris data responden di Google Spreadsheet (Mulai baris 2 hingga akhir)
-     * Baris 1 (Header kolom) tetap dipertahankan agar struktur tabel tidak rusak.
+     * Mengarsipkan tab aktif ke tab salinan baru (misal: "Arsip Data Responden 2026 (24-11-2026 15.05)")
+     * lalu mengosongkan baris A2:AB pada tab aktif (Header baris 1 tetap dipertahankan).
      */
-    public function hapusSemuaDataSurvei() {
-        if (empty($this->clientId) || empty($this->clientSecret) || empty($this->refreshToken)) {
+    public function arsipkanDanResetData() {
+        if (empty($this->clientId) || empty($this->clientSecret) || empty($this->refreshToken) || empty($this->spreadsheetId)) {
             throw new Exception("Kredensial Google Sheets API belum dikonfigurasi.");
         }
 
         $accessToken = $this->getAccessToken();
-        $range = urlencode("{$this->sheetName}!A2:AB");
+        $map = $this->getSheetsMap($accessToken, true);
+
+        if (!isset($map[$this->sheetName])) {
+            throw new Exception("Tab '{$this->sheetName}' tidak ditemukan di Google Spreadsheet.");
+        }
+
+        // Cek apakah ada data untuk diarsipkan
+        $existingRows = $this->ambilSemuaDataSurvei();
+        if (empty($existingRows)) {
+            return ['archived' => false, 'archiveName' => null];
+        }
+
+        $sourceSheetId = $map[$this->sheetName];
+        $baseArchiveName = 'Arsip ' . $this->sheetName . ' (' . date('d-m-Y H.i') . ')';
+        $archiveName = $baseArchiveName;
+        if (isset($map[$archiveName])) {
+            $archiveName = 'Arsip ' . $this->sheetName . ' (' . date('d-m-Y H.i.s') . ')';
+        }
+
+        // 1. Duplikasi seluruh sheet sebagai tab arsip
+        $url = "https://sheets.googleapis.com/v4/spreadsheets/{$this->spreadsheetId}:batchUpdate";
+        $payload = json_encode([
+            'requests' => [
+                [
+                    'duplicateSheet' => [
+                        'sourceSheetId'    => $sourceSheetId,
+                        'insertSheetIndex' => count($map),
+                        'newSheetName'     => $archiveName
+                    ]
+                ]
+            ]
+        ]);
+
+        $res = $this->httpRequest(
+            $url,
+            'POST',
+            [
+                "Authorization: Bearer {$accessToken}",
+                "Content-Type: application/json"
+            ],
+            $payload
+        );
+
+        if ($res['code'] !== 200) {
+            $result = json_decode($res['body'], true);
+            $msg = $result['error']['message'] ?? 'Gagal membuat tab arsip di Google Sheets';
+            throw new Exception("Google Sheets Archive Error ({$res['code']}): " . $msg);
+        }
+
+        // 2. Setelah arsip dipastikan sukses tersimpan, kosongkan data tab aktif (baris 2 ke bawah)
+        $this->hapusSemuaDataSurvei();
+
+        return ['archived' => true, 'archiveName' => $archiveName];
+    }
+
+    /**
+     * Menghapus seluruh baris data responden pada tab aktif di Google Spreadsheet (Mulai baris 2 hingga akhir)
+     * Baris 1 (Header kolom) tetap dipertahankan agar struktur tabel tidak rusak.
+     */
+    public function hapusSemuaDataSurvei() {
+        if (empty($this->clientId) || empty($this->clientSecret) || empty($this->refreshToken) || empty($this->spreadsheetId)) {
+            throw new Exception("Kredensial Google Sheets API belum dikonfigurasi.");
+        }
+
+        $accessToken = $this->getAccessToken();
+        $a1 = $this->formatA1Range($this->sheetName, 'A2:AB');
+        $range = urlencode($a1);
         $url = "https://sheets.googleapis.com/v4/spreadsheets/{$this->spreadsheetId}/values/{$range}:clear";
 
         $res = $this->httpRequest(
