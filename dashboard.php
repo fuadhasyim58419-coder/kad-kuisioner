@@ -418,6 +418,8 @@ if (isset($_GET['export']) && $_GET['export'] === 'csv') {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hasil Angket Kuesioner Kepuasan Pelanggan - PT Kaltim Adhiguna Dermaga</title>
+    <link rel="icon" type="image/jpeg" href="assets/img/logo_kad.jpg">
+    <link rel="apple-touch-icon" href="assets/img/logo_kad.jpg">
     <style>
         :root {
             --primary-navy: #0a2540;

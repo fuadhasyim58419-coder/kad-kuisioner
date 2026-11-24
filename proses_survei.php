@@ -176,6 +176,8 @@ echo '<!DOCTYPE html>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Survei Terkirim - PT Kaltim Adhiguna Dermaga</title>
+    <link rel="icon" type="image/jpeg" href="assets/img/logo_kad.jpg">
+    <link rel="apple-touch-icon" href="assets/img/logo_kad.jpg">
     <style>
         * {
             box-sizing: border-box;
@@ -184,7 +186,8 @@ echo '<!DOCTYPE html>
         }
         body {
             font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background: linear-gradient(135deg, #0a2540 0%, #005b96 50%, #0088cc 100%);
+            background: linear-gradient(135deg, rgba(0, 45, 98, 0.92) 0%, rgba(0, 80, 140, 0.85) 55%, rgba(0, 140, 200, 0.76) 100%),
+                        url("assets/img/dermaga_kad.jpg") center/cover no-repeat fixed;
             min-height: 100vh;
             display: flex;
             align-items: center;

@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Survei Kepuasan Pelanggan - PT Kaltim Adhiguna Dermaga</title>
+    <link rel="icon" type="image/jpeg" href="assets/img/logo_kad.jpg">
+    <link rel="apple-touch-icon" href="assets/img/logo_kad.jpg">
     <!-- Google Font: Plus Jakarta Sans (Modern BUMN / Enterprise Standard) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -806,6 +808,21 @@
             transform: translateY(0);
         }
 
+        .btn-next {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 3px;
+            line-height: 1.25;
+        }
+
+        .btn-next-sub {
+            font-size: 0.84rem;
+            font-weight: 600;
+            opacity: 0.92;
+        }
+
         /* 4. FOOTER (PELINDO MARITIME CORPORATE) */
         .site-footer {
             background-color: #0f172a;
@@ -1211,6 +1228,16 @@
                 gap: 8px;
             }
 
+            .btn-next {
+                flex-direction: column;
+                gap: 2px;
+                padding: 13px 18px;
+            }
+
+            .btn-next-sub {
+                font-size: 0.8rem;
+            }
+
             .site-footer {
                 padding: 30px 16px 24px;
             }
@@ -1311,7 +1338,10 @@
                     </div>
 
                     <div class="btn-action-group">
-                        <button type="button" class="btn-next" onclick="goToStep(2)">Lanjut ke Lembar Kuesioner (20 Pertanyaan) &rarr;</button>
+                        <button type="button" class="btn-next" onclick="goToStep(2)">
+                            <span>Lanjut ke Lembar Kuesioner</span>
+                            <span class="btn-next-sub">(20 Pertanyaan)</span>
+                        </button>
                     </div>
                 </div>
 
