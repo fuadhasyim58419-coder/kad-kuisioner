@@ -49,15 +49,28 @@
             min-height: 100vh;
         }
 
-        /* 1. TOP CORPORATE NAVBAR */
+        /* 1. TOP CORPORATE NAVBAR (WITH SMOOTH SCROLL-TO-CENTER ANIMATION) */
         .top-navbar {
-            background-color: var(--white);
+            background-color: rgba(255, 255, 255, 0.98);
             border-bottom: 1.5px solid var(--pelindo-border);
             padding: 12px 24px;
             position: sticky;
             top: 0;
             z-index: 100;
             box-shadow: 0 2px 12px rgba(0, 45, 98, 0.04);
+            transition: padding 0.42s cubic-bezier(0.22, 1, 0.36, 1),
+                        background-color 0.42s ease,
+                        box-shadow 0.42s ease,
+                        border-color 0.42s ease;
+        }
+
+        .top-navbar.is-scrolled {
+            padding: 8px 20px;
+            background-color: rgba(255, 255, 255, 0.94);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            box-shadow: 0 6px 24px rgba(0, 45, 98, 0.1);
+            border-bottom-color: rgba(0, 91, 150, 0.15);
         }
 
         .top-navbar-container {
@@ -65,22 +78,58 @@
             margin: 0 auto;
             display: flex;
             align-items: center;
-            justify-content: space-between;
-            gap: 16px;
+            gap: 0;
+        }
+
+        .nav-spacer-left {
+            flex-grow: 0;
+            flex-shrink: 1;
+            transition: flex-grow 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        .nav-spacer-right {
+            flex-grow: 1;
+            flex-shrink: 1;
+            transition: flex-grow 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        .top-navbar.is-scrolled .nav-spacer-left {
+            flex-grow: 1;
         }
 
         .brand-group {
             display: flex;
             align-items: center;
-            gap: 16px;
+            gap: 14px;
             text-decoration: none;
+            flex-shrink: 0;
+            min-width: 0;
+            transition: gap 0.42s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        .top-navbar.is-scrolled .brand-group {
+            gap: 10px;
         }
 
         .brand-logo {
-            height: 48px;
+            height: 46px;
             width: auto;
             object-fit: contain;
             border-radius: 4px;
+            flex-shrink: 0;
+            transition: height 0.42s cubic-bezier(0.22, 1, 0.36, 1),
+                        transform 0.42s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        .top-navbar.is-scrolled .brand-logo {
+            height: 34px;
+        }
+
+        .brand-text {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            min-width: 0;
         }
 
         .brand-text h1 {
@@ -89,6 +138,14 @@
             color: var(--pelindo-navy);
             letter-spacing: -0.2px;
             line-height: 1.2;
+            white-space: nowrap;
+            transition: font-size 0.42s cubic-bezier(0.22, 1, 0.36, 1),
+                        letter-spacing 0.42s ease;
+        }
+
+        .top-navbar.is-scrolled .brand-text h1 {
+            font-size: 0.96rem;
+            letter-spacing: 0.1px;
         }
 
         .brand-text p {
@@ -96,12 +153,41 @@
             color: var(--pelindo-gray);
             font-weight: 600;
             letter-spacing: 0.2px;
+            max-height: 36px;
+            opacity: 1;
+            overflow: hidden;
+            margin-top: 2px;
+            transition: max-height 0.42s cubic-bezier(0.22, 1, 0.36, 1),
+                        opacity 0.28s ease,
+                        margin-top 0.42s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        .top-navbar.is-scrolled .brand-text p {
+            max-height: 0;
+            opacity: 0;
+            margin-top: 0;
         }
 
         .nav-actions {
             display: flex;
             align-items: center;
             gap: 12px;
+            max-width: 400px;
+            opacity: 1;
+            overflow: hidden;
+            white-space: nowrap;
+            flex-shrink: 0;
+            margin-left: 12px;
+            transition: max-width 0.48s cubic-bezier(0.22, 1, 0.36, 1),
+                        opacity 0.28s ease,
+                        margin-left 0.48s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        .top-navbar.is-scrolled .nav-actions {
+            max-width: 0;
+            opacity: 0;
+            margin-left: 0;
+            pointer-events: none;
         }
 
         .spm-badge {
@@ -734,75 +820,277 @@
                 padding: 10px 14px;
             }
 
+            .top-navbar.is-scrolled {
+                padding: 8px 14px;
+            }
+
+            .brand-group {
+                gap: 10px;
+                flex-shrink: 1;
+            }
+
             .brand-logo {
-                height: 38px;
+                height: 36px;
+            }
+
+            .top-navbar.is-scrolled .brand-logo {
+                height: 30px;
             }
 
             .brand-text h1 {
-                font-size: 0.92rem;
+                font-size: 0.86rem;
+                white-space: normal;
+            }
+
+            .top-navbar.is-scrolled .brand-text h1 {
+                font-size: 0.88rem;
+                white-space: nowrap;
             }
 
             .brand-text p {
-                font-size: 0.72rem;
+                font-size: 0.68rem;
+                line-height: 1.25;
+                max-height: 40px;
             }
 
             .spm-badge {
                 display: none;
             }
 
+            .nav-actions {
+                margin-left: 8px;
+            }
+
+            .btn-admin-link {
+                font-size: 0.74rem;
+                padding: 7px 10px;
+                background-color: var(--pelindo-light-blue);
+                border: 1px solid rgba(0, 91, 150, 0.2);
+                border-radius: 8px;
+                white-space: nowrap;
+            }
+
             .hero-banner {
-                padding: 36px 14px 50px;
+                padding: 32px 14px 48px;
+            }
+
+            .hero-tag {
+                font-size: 0.68rem;
+                padding: 5px 12px;
+                margin-bottom: 12px;
+                letter-spacing: 0.6px;
             }
 
             .hero-title {
-                font-size: 1.45rem;
+                font-size: 1.48rem;
+                margin-bottom: 10px;
             }
 
             .hero-desc {
-                font-size: 0.88rem;
+                font-size: 0.86rem;
+                margin-bottom: 20px;
+                line-height: 1.55;
+            }
+
+            .hero-highlights {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 8px;
+            }
+
+            .highlight-pill {
+                font-size: 0.72rem;
+                padding: 7px 10px;
+                justify-content: center;
+                text-align: center;
+                line-height: 1.3;
+                gap: 5px;
             }
 
             .main-wrapper {
-                margin-top: -24px;
+                margin: -24px auto 40px;
                 padding: 0 10px;
             }
 
+            .survey-card-container {
+                border-radius: 14px;
+            }
+
             .step-progress-wrapper {
-                padding: 14px 18px;
+                padding: 14px 16px;
+            }
+
+            .step-progress-header {
+                flex-wrap: wrap;
+                gap: 6px;
+            }
+
+            .step-progress-title {
+                font-size: 0.86rem;
+                gap: 8px;
+                flex-wrap: wrap;
+            }
+
+            .step-badge {
+                font-size: 0.7rem;
+                padding: 3px 9px;
+            }
+
+            .step-progress-number {
+                font-size: 0.76rem;
             }
 
             form {
-                padding: 20px 14px;
+                padding: 18px 14px 22px;
             }
 
             .identity-box {
                 padding: 18px 14px;
+                margin-bottom: 20px;
             }
 
+            .identity-header {
+                padding-bottom: 12px;
+                margin-bottom: 18px;
+            }
+
+            .identity-header h2 {
+                font-size: 1.1rem;
+            }
+
+            .identity-header p {
+                font-size: 0.85rem;
+            }
+
+            .form-group {
+                margin-bottom: 18px;
+            }
+
+            .form-group label {
+                font-size: 0.88rem;
+            }
+
+            .form-control {
+                font-size: 16px; /* Mencegah auto-zoom di iOS Safari */
+                padding: 12px 14px;
+            }
+
+            /* PANDUAN LIKERT MOBILE: URUT DARI SANGAT PUAS (4) KE TIDAK PUAS (1) */
+            .likert-legend-bar {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 8px 10px;
+                padding: 12px 14px;
+                margin-bottom: 20px;
+                font-size: 0.78rem;
+            }
+
+            .likert-legend-bar .legend-item:nth-child(4) { order: 1; }
+            .likert-legend-bar .legend-item:nth-child(3) { order: 2; }
+            .likert-legend-bar .legend-item:nth-child(2) { order: 3; }
+            .likert-legend-bar .legend-item:nth-child(1) { order: 4; }
+
+            .dimension-card {
+                margin-bottom: 20px;
+                border-radius: 12px;
+            }
+
+            .dimension-header {
+                padding: 12px 14px;
+                gap: 10px;
+            }
+
+            .dim-badge {
+                width: 28px;
+                height: 28px;
+                font-size: 0.9rem;
+                border-radius: 7px;
+            }
+
+            .dimension-header h2 {
+                font-size: 0.98rem;
+                line-height: 1.3;
+            }
+
+            .question-item {
+                padding: 16px 14px;
+            }
+
+            .question-title {
+                font-size: 0.92rem;
+                margin-bottom: 14px;
+                line-height: 1.5;
+            }
+
+            /* LIKERT MOBILE: SANGAT PUAS (4) DI PALING ATAS */
             .likert-grid {
-                grid-template-columns: 1fr;
-                gap: 8px;
+                display: flex;
+                flex-direction: column-reverse;
+                gap: 9px;
             }
 
             .likert-label {
                 flex-direction: row;
                 justify-content: flex-start;
-                min-height: 50px;
-                padding: 10px 16px;
+                min-height: 52px;
+                padding: 11px 16px;
                 gap: 14px;
                 text-align: left;
+                border-radius: 12px;
+                border-width: 1.8px;
+                position: relative;
+                -webkit-tap-highlight-color: transparent;
+            }
+
+            .likert-label:active {
+                transform: scale(0.985);
+            }
+
+            /* Subtle highlight pada Sangat Puas agar menarik perhatian responden */
+            .likert-option.opt-sp .likert-label {
+                border-color: rgba(16, 185, 129, 0.45);
+                background-color: #f7fefb;
+            }
+
+            .likert-option.opt-sp .opt-score {
+                background-color: #d1fae5;
+                color: #047857;
+            }
+
+            .likert-option.opt-p .opt-score {
+                background-color: #e0f2fe;
+                color: #0369a1;
+            }
+
+            .likert-option.opt-cp .opt-score {
+                background-color: #fef3c7;
+                color: #b45309;
+            }
+
+            .likert-option.opt-tp .opt-score {
+                background-color: #fee2e2;
+                color: #b91c1c;
             }
 
             .opt-score {
                 margin-bottom: 0;
-                width: 28px;
-                height: 28px;
+                width: 30px;
+                height: 30px;
                 border-radius: 50%;
                 background-color: #f1f5f9;
                 display: inline-flex;
                 align-items: center;
                 justify-content: center;
-                font-size: 0.95rem;
+                font-size: 0.92rem;
+                flex-shrink: 0;
+            }
+
+            .likert-option input[type="radio"]:checked + .likert-label::after {
+                content: "✓";
+                margin-left: auto;
+                font-weight: 800;
+                font-size: 1rem;
+                color: #ffffff;
             }
 
             .likert-option input[type="radio"]:checked + .likert-label .opt-score {
@@ -812,14 +1100,51 @@
 
             .opt-text {
                 font-size: 0.92rem;
+                color: var(--pelindo-slate);
+            }
+
+            .suggestion-box {
+                padding: 18px 14px;
+                margin-bottom: 22px;
+            }
+
+            .suggestion-box label {
+                font-size: 0.96rem;
+            }
+
+            .suggestion-box p {
+                font-size: 0.84rem;
             }
 
             .btn-action-group {
                 flex-direction: column-reverse;
+                gap: 10px;
             }
 
             .btn-prev, .btn-next, .btn-submit {
                 width: 100%;
+                min-height: 50px;
+                padding: 14px 18px;
+                font-size: 0.94rem;
+                border-radius: 12px;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                gap: 8px;
+            }
+
+            .site-footer {
+                padding: 30px 16px 24px;
+            }
+
+            .footer-info {
+                font-size: 0.82rem;
+            }
+
+            .footer-links {
+                flex-direction: column;
+                gap: 8px;
+                align-items: center;
             }
         }
     </style>
@@ -827,15 +1152,17 @@
 <body>
 
     <!-- 1. TOP CORPORATE NAVBAR -->
-    <header class="top-navbar">
+    <header class="top-navbar" id="main-navbar">
         <div class="top-navbar-container">
+            <div class="nav-spacer-left" aria-hidden="true"></div>
             <a href="index.html" class="brand-group">
                 <img src="assets/img/logo_kad.jpg" alt="Logo PT KAD" class="brand-logo">
                 <div class="brand-text">
                     <h1>PT KALTIM ADHIGUNA DERMAGA</h1>
-                    <p>Pelayanan Jasa Bongkar Muat (Stevedoring) &bull; Pelabuhan Bontang</p>
+                    <p>Pelayanan Jasa Bongkar Muat (<i>Stevedoring</i>) &bull; Pelabuhan Bontang</p>
                 </div>
             </a>
+            <div class="nav-spacer-right" aria-hidden="true"></div>
             <div class="nav-actions">
                 <div class="spm-badge">
                     <svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/></svg>
@@ -900,9 +1227,8 @@
                         </div>
 
                         <div class="form-group">
-                            <label for="nama_perusahaan">&#127970; Nama Perusahaan  <span class="required">*</span></label>
+                            <label for="nama_perusahaan">&#127970; Nama Perusahaan <span class="required">*</span></label>
                             <input type="text" id="nama_perusahaan" name="nama_perusahaan" class="form-control" placeholder=" " required>
-                            <p class="form-hint">Nama perusahaan pemilik kargo (shipper/consignee) atau keagenan kapal.</p>
                         </div>
 
                         <div class="form-group">
@@ -1419,7 +1745,7 @@
 
                     <div class="btn-action-group">
                         <button type="button" class="btn-prev" onclick="goToStep(1)">&larr; Kembali ke Identitas</button>
-                        <button type="submit" class="btn-submit">&#10004; Kirim Penilaian Kuesioner Sekarang</button>
+                        <button type="submit" class="btn-submit">&#10004; Kirim Jawaban Sekarang</button>
                     </div>
                 </div>
 
@@ -1435,8 +1761,8 @@
                 <span class="footer-company">PT KALTIM ADHIGUNA DERMAGA</span>
             </div>
             <p class="footer-info">
-                Divisi Manajemen Operasional Pelabuhan &amp; Bongkar Muat (Stevedoring)<br>
-                Terminal Dermaga Pelabuhan, Kota Bontang, Kalimantan Timur &bull; Indonesia
+                Perusahaan Jasa Bongkar Muat (<i>Stevedoring</i>) Terpercaya di Kalimantan Timur<br>
+                melayani lebih dari 300 mitra domestik dan International
             </p>
             <div class="footer-links">
                 <span>&copy; 2026 PT Kaltim Adhiguna Dermaga. Hak Cipta Dilindungi.</span>
@@ -1445,8 +1771,34 @@
         </div>
     </footer>
 
-    <!-- SCRIPT MULTI-STEP WIZARD -->
+    <!-- SCRIPT MULTI-STEP WIZARD & SMOOTH STICKY HEADER -->
     <script>
+        // Animasi halus header saat halaman di-scroll ke bawah (rata tengah logo & nama perusahaan)
+        (function () {
+            const navbar = document.getElementById('main-navbar');
+            let isScrolled = false;
+            let ticking = false;
+
+            function updateNavbarOnScroll() {
+                const y = window.scrollY || window.pageYOffset;
+                if (!isScrolled && y > 85) {
+                    isScrolled = true;
+                    navbar.classList.add('is-scrolled');
+                } else if (isScrolled && y < 35) {
+                    isScrolled = false;
+                    navbar.classList.remove('is-scrolled');
+                }
+                ticking = false;
+            }
+
+            window.addEventListener('scroll', function () {
+                if (!ticking) {
+                    window.requestAnimationFrame(updateNavbarOnScroll);
+                    ticking = true;
+                }
+            }, { passive: true });
+        })();
+
         function goToStep(step) {
             const step1 = document.getElementById('step-1');
             const step2 = document.getElementById('step-2');
@@ -1467,7 +1819,7 @@
                     return;
                 }
                 if (!perusahaan.value.trim()) {
-                    alert('Mohon isi Nama Perusahaan / Agen Pelayaran terlebih dahulu.');
+                    alert('Mohon isi Nama Perusahaan terlebih dahulu.');
                     perusahaan.focus();
                     return;
                 }

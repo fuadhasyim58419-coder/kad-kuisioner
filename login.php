@@ -1,4 +1,9 @@
 <?php
+ob_start();
+
+$is_https = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
+    || (($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '') === 'https');
+
 // Pastikan direktori session dapat ditulis di lingkungan serverless (misal Vercel /tmp)
 if (session_status() === PHP_SESSION_NONE) {
     $savePath = session_save_path();
@@ -30,7 +35,10 @@ if (isset($_SESSION['kad_admin_logged']) && $_SESSION['kad_admin_logged'] === tr
 }
 
 if ($is_logged) {
-    header("Location: dashboard.php");
+    header("Location: dashboard.php", true, 302);
+    if (ob_get_level() > 0) {
+        @ob_end_clean();
+    }
     exit;
 }
 
@@ -44,15 +52,19 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
         // Simpan Signed Auth Cookie agar tetap login stabil di serverless lambda instance Vercel
         $cookie_val = hash_hmac('sha256', 'kad_admin_authorized_' . $username, $secret_key);
-        setcookie('kad_admin_auth', $cookie_val, [
+        @setcookie('kad_admin_auth', $cookie_val, [
             'expires'  => time() + (86400 * 7), // 7 hari
             'path'     => '/',
-            'secure'   => isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on',
+            'secure'   => $is_https,
             'httponly' => true,
             'samesite' => 'Lax'
         ]);
+        @session_write_close();
 
-        header("Location: dashboard.php");
+        header("Location: dashboard.php", true, 302);
+        if (ob_get_level() > 0) {
+            @ob_end_clean();
+        }
         exit;
     } else {
         $error = "Username atau password yang Anda masukkan salah!";
@@ -213,6 +225,27 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             color: var(--primary-blue);
             text-decoration: none;
             font-weight: 600;
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 14px;
+            }
+            .login-header {
+                padding: 22px 18px;
+            }
+            .login-header h2 {
+                font-size: 1.2rem;
+            }
+            form {
+                padding: 22px 18px;
+            }
+            .form-control {
+                font-size: 16px;
+            }
+            .btn-submit {
+                min-height: 48px;
+            }
         }
     </style>
 </head>

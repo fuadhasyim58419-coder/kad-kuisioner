@@ -1,4 +1,9 @@
 <?php
+ob_start();
+
+$is_https = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
+    || (($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '') === 'https');
+
 // Pastikan direktori session dapat ditulis di lingkungan serverless (misal Vercel /tmp)
 if (session_status() === PHP_SESSION_NONE) {
     $savePath = session_save_path();
@@ -8,6 +13,45 @@ if (session_status() === PHP_SESSION_NONE) {
         }
     }
     @session_start();
+}
+
+// ----------------------------------------------------------------------------
+// FITUR LOGOUT ADMIN (DITANGANI LEBIH AWAL AGAR TIDAK PERNAH ERROR & LANGSUNG KEMBALI KE HALAMAN AWAL)
+// ----------------------------------------------------------------------------
+if (isset($_GET['action']) && $_GET['action'] === 'logout') {
+    $_SESSION = [];
+    if (session_status() === PHP_SESSION_ACTIVE) {
+        if (ini_get("session.use_cookies")) {
+            $params = session_get_cookie_params();
+            @setcookie(session_name(), '', [
+                'expires'  => time() - 42000,
+                'path'     => $params["path"] ?: '/',
+                'secure'   => $is_https,
+                'httponly' => true,
+                'samesite' => 'Lax'
+            ]);
+        }
+        @session_destroy();
+        @session_write_close();
+    }
+
+    // Hapus Signed Auth Cookie dengan atribut yang cocok (HTTPS & HTTP fallback)
+    @setcookie('kad_admin_auth', '', [
+        'expires'  => time() - 3600,
+        'path'     => '/',
+        'secure'   => $is_https,
+        'httponly' => true,
+        'samesite' => 'Lax'
+    ]);
+    unset($_COOKIE['kad_admin_auth']);
+
+    header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
+    header("Pragma: no-cache");
+    header("Location: index.html", true, 302);
+    if (ob_get_level() > 0) {
+        @ob_end_clean();
+    }
+    exit;
 }
 
 $secret_key = getenv('ADMIN_SECRET') ?: 'pt_kad_stevedoring_secret_2026';
@@ -27,25 +71,10 @@ if (isset($_SESSION['kad_admin_logged']) && $_SESSION['kad_admin_logged'] === tr
 }
 
 if (!$is_logged) {
-    header("Location: login.php");
-    exit;
-}
-
-// ----------------------------------------------------------------------------
-// FITUR LOGOUT ADMIN
-// ----------------------------------------------------------------------------
-if (isset($_GET['action']) && $_GET['action'] === 'logout') {
-    unset($_SESSION['kad_admin_logged']);
-    unset($_SESSION['admin_user']);
-    if (session_status() === PHP_SESSION_ACTIVE) {
-        @session_destroy();
+    header("Location: login.php", true, 302);
+    if (ob_get_level() > 0) {
+        @ob_end_clean();
     }
-    setcookie('kad_admin_auth', '', [
-        'expires'  => time() - 3600,
-        'path'     => '/',
-        'httponly' => true
-    ]);
-    header("Location: login.php");
     exit;
 }
 
@@ -569,6 +598,20 @@ if (isset($_GET['export']) && $_GET['export'] === 'csv') {
         /* Tables */
         .table-responsive {
             overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .mobile-scroll-hint {
+            display: none;
+            font-size: 0.76rem;
+            color: var(--primary-blue);
+            background-color: var(--light-blue);
+            border: 1px solid #bfdbfe;
+            border-radius: 6px;
+            padding: 6px 10px;
+            margin-bottom: 10px;
+            font-weight: 600;
+            text-align: center;
         }
 
         table.tbl-matrix {
@@ -793,6 +836,183 @@ if (isset($_GET['export']) && $_GET['export'] === 'csv') {
         .print-header {
             display: none;
         }
+
+        .questions-ref-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 16px;
+        }
+
+        /* RESPONSIVE MOBILE STYLES (PORTAL ADMIN) */
+        @media (max-width: 768px) {
+            body {
+                padding-bottom: 32px;
+            }
+
+            .navbar {
+                padding: 16px 14px;
+                gap: 14px;
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .navbar-brand {
+                gap: 10px !important;
+            }
+
+            .navbar-brand img {
+                height: 38px !important;
+                flex-shrink: 0;
+            }
+
+            .navbar-brand h1 {
+                font-size: 1.02rem;
+                line-height: 1.25;
+            }
+
+            .navbar-brand p {
+                font-size: 0.78rem;
+                line-height: 1.4;
+                margin-top: 2px;
+            }
+
+            .navbar-brand p span {
+                display: inline-block !important;
+                margin-left: 0 !important;
+                margin-top: 4px;
+            }
+
+            .nav-actions {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 8px;
+                width: 100%;
+            }
+
+            .nav-actions .btn {
+                width: 100%;
+                justify-content: center;
+                text-align: center;
+                padding: 10px 10px;
+                font-size: 0.8rem;
+                min-height: 42px;
+                white-space: nowrap;
+            }
+
+            .main-container {
+                margin: 16px auto;
+                padding: 0 12px;
+            }
+
+            .kpi-grid {
+                grid-template-columns: 1fr;
+                gap: 12px;
+                margin-bottom: 18px;
+            }
+
+            .kpi-card {
+                padding: 16px;
+            }
+
+            .kpi-value {
+                font-size: 1.65rem;
+            }
+
+            .card {
+                padding: 16px 14px;
+                margin-bottom: 18px;
+                border-radius: 10px;
+            }
+
+            .card-header {
+                padding-bottom: 10px;
+                margin-bottom: 14px;
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 6px;
+            }
+
+            .card-title {
+                font-size: 1rem;
+                line-height: 1.35;
+            }
+
+            .scale-interval-box {
+                grid-template-columns: repeat(2, 1fr);
+                padding: 12px;
+                gap: 10px;
+                font-size: 0.8rem;
+            }
+
+            .dim-grid {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+
+            .dim-card {
+                padding: 14px;
+            }
+
+            .dim-card .dim-val {
+                font-size: 1.35rem;
+            }
+
+            .mobile-scroll-hint {
+                display: block;
+            }
+
+            table.tbl-matrix {
+                font-size: 0.78rem;
+            }
+
+            table.tbl-matrix th, table.tbl-matrix td {
+                padding: 6px 5px;
+            }
+
+            .questions-ref-grid {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+
+            .signature-section {
+                padding: 18px 14px;
+                margin-top: 20px;
+            }
+
+            .conclusion-statement {
+                font-size: 0.92rem;
+                padding: 14px;
+                margin-bottom: 20px;
+            }
+
+            .signature-box {
+                justify-content: center;
+            }
+
+            .signature-person {
+                min-width: auto;
+                width: 100%;
+            }
+
+            .signature-person .title {
+                margin-bottom: 48px;
+            }
+
+            .modal-box {
+                padding: 20px 16px;
+            }
+
+            .modal-actions {
+                flex-direction: column-reverse;
+                gap: 8px;
+            }
+
+            .modal-actions .btn {
+                width: 100%;
+                justify-content: center;
+                padding: 12px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -906,6 +1126,7 @@ if (isset($_GET['export']) && $_GET['export'] === 'csv') {
                 <span style="font-size: 0.84rem; color: var(--text-muted);">Sebaran Frekuensi Jawaban untuk 20 Butir Soal</span>
             </div>
 
+            <div class="mobile-scroll-hint">&larr; Geser tabel ke samping untuk melihat seluruh 20 butir soal &rarr;</div>
             <div class="table-responsive">
                 <table class="tbl-matrix">
                     <thead>
@@ -970,6 +1191,7 @@ if (isset($_GET['export']) && $_GET['export'] === 'csv') {
                 <span style="font-size: 0.84rem; color: var(--text-muted);">Skor Maksimal per Soal = 4 &times; <?= $N ?> = <?= 4 * $N ?></span>
             </div>
 
+            <div class="mobile-scroll-hint">&larr; Geser tabel ke samping untuk melihat seluruh 20 butir soal &rarr;</div>
             <div class="table-responsive">
                 <table class="tbl-matrix">
                     <thead>
@@ -1027,6 +1249,7 @@ if (isset($_GET['export']) && $_GET['export'] === 'csv') {
                 <span style="font-size: 0.84rem; color: var(--text-muted);"><?= $N ?> Data Perusahaan Pengisi</span>
             </div>
 
+            <div class="mobile-scroll-hint">&larr; Geser tabel ke samping untuk melihat jawaban lengkap responden &rarr;</div>
             <div class="table-responsive">
                 <table class="tbl-matrix">
                     <thead>
@@ -1088,7 +1311,7 @@ if (isset($_GET['export']) && $_GET['export'] === 'csv') {
                 <button type="button" class="btn" style="background: #eef6fb; color: var(--primary-blue); font-size: 0.85rem; padding: 6px 14px;" id="toggle-q-btn">Tampilkan / Sembunyikan &darr;</button>
             </div>
             <div id="questions-list-body" style="display: block; padding-top: 10px;">
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 16px;">
+                <div class="questions-ref-grid">
                     <?php 
                     $currentDim = '';
                     foreach ($questionDetails as $num => $q): 

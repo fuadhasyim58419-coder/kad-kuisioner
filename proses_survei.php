@@ -165,6 +165,7 @@ try {
     $sheetsSuccess = true;
 } catch (Exception $e) {
     $sheetsError = $e->getMessage();
+    error_log("Google Sheets Sync Error: " . $sheetsError);
 }
 
 // Menampilkan halaman notifikasi sukses dengan branding Pelindo & PT KAD
@@ -187,24 +188,24 @@ echo '<!DOCTYPE html>
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 20px;
+            padding: 16px;
         }
         .notification-card {
-            max-width: 520px;
+            max-width: 500px;
             width: 100%;
             background-color: #ffffff;
-            border-radius: 14px;
+            border-radius: 16px;
             box-shadow: 0 15px 35px rgba(0, 0, 0, 0.25);
             overflow: hidden;
             text-align: center;
-            padding: 36px 28px;
+            padding: 32px 24px;
         }
         .alert-success {
             background-color: #ecfdf5;
             border: 2px solid #10b981;
             color: #065f46;
-            padding: 24px 20px;
-            border-radius: 10px;
+            padding: 24px 18px;
+            border-radius: 12px;
             margin-bottom: 22px;
         }
         .success-icon {
@@ -221,31 +222,14 @@ echo '<!DOCTYPE html>
             margin-bottom: 14px;
         }
         .alert-success h2 {
-            font-size: 1.4rem;
+            font-size: 1.35rem;
             margin-bottom: 8px;
             color: #047857;
+            line-height: 1.3;
         }
         .alert-success p {
-            font-size: 0.95rem;
-            line-height: 1.5;
-        }
-        .sheets-status {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            font-size: 0.84rem;
-            padding: 6px 14px;
-            border-radius: 50px;
-            margin-top: 14px;
-            font-weight: 600;
-        }
-        .sheets-ok {
-            background-color: #d1fae5;
-            color: #065f46;
-        }
-        .sheets-notice {
-            background-color: #fef3c7;
-            color: #92400e;
+            font-size: 0.94rem;
+            line-height: 1.55;
         }
         .btn-selesai {
             display: block;
@@ -255,8 +239,8 @@ echo '<!DOCTYPE html>
             color: #ffffff;
             text-decoration: none;
             font-weight: 800;
-            font-size: 1.02rem;
-            border-radius: 10px;
+            font-size: 1rem;
+            border-radius: 12px;
             box-shadow: 0 6px 16px rgba(0, 45, 98, 0.25);
             transition: all 0.2s ease;
             text-align: center;
@@ -270,19 +254,29 @@ echo '<!DOCTYPE html>
         .btn-selesai:active {
             transform: translateY(0);
         }
+        @media (max-width: 480px) {
+            .notification-card {
+                padding: 26px 18px;
+            }
+            .alert-success {
+                padding: 20px 14px;
+            }
+            .alert-success h2 {
+                font-size: 1.2rem;
+            }
+            .alert-success p {
+                font-size: 0.88rem;
+            }
+        }
     </style>
 </head>
 <body>
     <div class="notification-card">
-        <img src="assets/img/logo_kad.jpg" alt="Logo PT KAD" style="height: 52px; margin-bottom: 16px; object-fit: contain;">
+        <img src="assets/img/logo_kad.jpg" alt="Logo PT KAD" style="height: 50px; margin-bottom: 16px; object-fit: contain;">
         <div class="alert-success">
             <div class="success-icon">&#10003;</div>
             <h2>Terima kasih atas penilaian Anda</h2>
-            <p>Masukan dan evaluasi yang Anda berikan telah berhasil kami terima untuk peningkatan mutu layanan operasional bongkar muat (stevedoring) PT Kaltim Adhiguna Dermaga.</p>
-            ' . ($sheetsSuccess 
-                ? '<div class="sheets-status sheets-ok">&#10004; Tersinkronisasi ke Google Spreadsheet</div>' 
-                : ($sheetsError ? '<div class="sheets-status sheets-notice">&#9888; Google Sheets Info: ' . htmlspecialchars($sheetsError) . '</div>' : '')
-            ) . '
+            <p>Masukan dan evaluasi yang Anda berikan telah berhasil kami terima untuk peningkatan mutu layanan operasional bongkar muat (<i>stevedoring</i>) PT Kaltim Adhiguna Dermaga.</p>
         </div>
         <div>
             <a href="index.html" class="btn-selesai">&#10004; Selesai</a>
