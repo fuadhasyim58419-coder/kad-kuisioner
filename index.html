@@ -84,12 +84,14 @@
         .nav-spacer-left {
             flex-grow: 0;
             flex-shrink: 1;
+            flex-basis: 0;
             transition: flex-grow 0.5s cubic-bezier(0.22, 1, 0.36, 1);
         }
 
         .nav-spacer-right {
             flex-grow: 1;
             flex-shrink: 1;
+            flex-basis: 0;
             transition: flex-grow 0.5s cubic-bezier(0.22, 1, 0.36, 1);
         }
 
@@ -154,18 +156,22 @@
             font-weight: 600;
             letter-spacing: 0.2px;
             max-height: 36px;
+            max-width: 460px;
             opacity: 1;
             overflow: hidden;
             margin-top: 2px;
             transition: max-height 0.42s cubic-bezier(0.22, 1, 0.36, 1),
-                        opacity 0.28s ease,
+                        max-width 0.42s cubic-bezier(0.22, 1, 0.36, 1),
+                        opacity 0.25s ease,
                         margin-top 0.42s cubic-bezier(0.22, 1, 0.36, 1);
         }
 
         .top-navbar.is-scrolled .brand-text p {
             max-height: 0;
+            max-width: 0;
             opacity: 0;
             margin-top: 0;
+            white-space: nowrap;
         }
 
         .nav-actions {
@@ -179,14 +185,16 @@
             flex-shrink: 0;
             margin-left: 12px;
             transition: max-width 0.48s cubic-bezier(0.22, 1, 0.36, 1),
-                        opacity 0.28s ease,
-                        margin-left 0.48s cubic-bezier(0.22, 1, 0.36, 1);
+                        opacity 0.25s ease,
+                        margin-left 0.48s cubic-bezier(0.22, 1, 0.36, 1),
+                        gap 0.48s cubic-bezier(0.22, 1, 0.36, 1);
         }
 
         .top-navbar.is-scrolled .nav-actions {
             max-width: 0;
             opacity: 0;
             margin-left: 0;
+            gap: 0;
             pointer-events: none;
         }
 
@@ -285,28 +293,8 @@
             font-size: 1.02rem;
             color: rgba(255, 255, 255, 0.92);
             max-width: 680px;
-            margin: 0 auto 28px;
+            margin: 0 auto 4px;
             line-height: 1.6;
-        }
-
-        .hero-highlights {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 12px 20px;
-        }
-
-        .highlight-pill {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            background-color: rgba(15, 23, 42, 0.45);
-            backdrop-filter: blur(4px);
-            padding: 6px 14px;
-            border-radius: 8px;
-            font-size: 0.82rem;
-            font-weight: 600;
-            border: 1px solid rgba(255, 255, 255, 0.15);
         }
 
         /* 3. MAIN FORM CONTAINER */
@@ -431,6 +419,16 @@
             font-weight: bold;
         }
 
+        .form-group label span.optional-tag {
+            font-size: 0.76rem;
+            font-weight: 600;
+            color: var(--pelindo-gray);
+            background-color: #f1f5f9;
+            padding: 2px 8px;
+            border-radius: 99px;
+            margin-left: 2px;
+        }
+
         .form-control {
             width: 100%;
             padding: 13px 16px;
@@ -461,37 +459,93 @@
             margin-top: 6px;
         }
 
-        /* LIKERT LEGEND BANNER */
-        .likert-legend-bar {
-            background-color: #f8fafc;
-            border: 1.5px solid var(--pelindo-border);
-            border-radius: 12px;
-            padding: 16px 20px;
+        /* PETUNJUK PENGISIAN KUESIONER (MODERN CORPORATE CARD) */
+        .guide-card {
+            background-color: #ffffff;
+            border: 1.5px solid #cbd5e1;
+            border-left: 5px solid var(--pelindo-navy);
+            border-radius: 14px;
+            overflow: hidden;
             margin-bottom: 28px;
+            box-shadow: 0 4px 14px rgba(0, 45, 98, 0.05);
+        }
+
+        .guide-header {
+            background: linear-gradient(90deg, #eef7fc 0%, #f8fafc 100%);
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--pelindo-border);
+        }
+
+        .guide-header-title {
             display: flex;
-            flex-wrap: wrap;
-            justify-content: space-around;
-            gap: 12px;
-            font-size: 0.85rem;
-            font-weight: 700;
-        }
-
-        .legend-item {
-            display: inline-flex;
             align-items: center;
-            gap: 8px;
+            gap: 9px;
+            font-size: 1.02rem;
+            font-weight: 800;
+            color: var(--pelindo-navy);
+            margin-bottom: 4px;
         }
 
-        .legend-dot {
-            width: 22px;
-            height: 22px;
-            border-radius: 50%;
+        .guide-header-desc {
+            font-size: 0.86rem;
+            color: var(--pelindo-slate);
+            line-height: 1.5;
+        }
+
+        .guide-body {
+            padding: 16px 20px 18px;
+        }
+
+        .guide-scale-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+
+        .guide-scale-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 11px 12px;
+            border-radius: 10px;
+            border: 1.5px solid var(--pelindo-border);
+            background-color: #fafcfe;
+        }
+
+        .guide-scale-item.scale-sp { border-color: rgba(16, 185, 129, 0.35); background-color: #f4fdf9; }
+        .guide-scale-item.scale-p  { border-color: rgba(2, 132, 199, 0.3); background-color: #f4faff; }
+        .guide-scale-item.scale-cp { border-color: rgba(245, 158, 11, 0.35); background-color: #fffdf5; }
+        .guide-scale-item.scale-tp { border-color: rgba(239, 68, 68, 0.3); background-color: #fff7f7; }
+
+        .guide-scale-badge {
+            width: 28px;
+            height: 28px;
+            border-radius: 8px;
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            color: var(--white);
-            font-size: 0.75rem;
+            color: #ffffff;
+            font-size: 0.8rem;
             font-weight: 800;
+            flex-shrink: 0;
+        }
+
+        .guide-scale-info strong {
+            display: block;
+            font-size: 0.84rem;
+            font-weight: 800;
+            color: var(--pelindo-dark);
+            line-height: 1.25;
+        }
+
+        .guide-footnote {
+            padding-top: 12px;
+            border-top: 1px dashed var(--pelindo-border);
+            font-size: 0.82rem;
+            color: var(--pelindo-gray);
+            line-height: 1.55;
+            text-align: justify;
         }
 
         .dot-tp { background-color: var(--tp-color); }
@@ -888,23 +942,8 @@
 
             .hero-desc {
                 font-size: 0.86rem;
-                margin-bottom: 20px;
+                margin-bottom: 4px;
                 line-height: 1.55;
-            }
-
-            .hero-highlights {
-                display: grid;
-                grid-template-columns: repeat(2, 1fr);
-                gap: 8px;
-            }
-
-            .highlight-pill {
-                font-size: 0.72rem;
-                padding: 7px 10px;
-                justify-content: center;
-                text-align: center;
-                line-height: 1.3;
-                gap: 5px;
             }
 
             .main-wrapper {
@@ -975,20 +1014,59 @@
                 padding: 12px 14px;
             }
 
-            /* PANDUAN LIKERT MOBILE: URUT DARI SANGAT PUAS (4) KE TIDAK PUAS (1) */
-            .likert-legend-bar {
-                display: grid;
-                grid-template-columns: repeat(2, 1fr);
-                gap: 8px 10px;
-                padding: 12px 14px;
+            /* PETUNJUK PENGISIAN MOBILE */
+            .guide-card {
                 margin-bottom: 20px;
+                border-radius: 12px;
+                border-left-width: 4px;
+            }
+
+            .guide-header {
+                padding: 13px 14px;
+            }
+
+            .guide-header-title {
+                font-size: 0.94rem;
+            }
+
+            .guide-header-desc {
+                font-size: 0.8rem;
+            }
+
+            .guide-body {
+                padding: 12px 14px 14px;
+            }
+
+            .guide-scale-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 8px;
+                margin-bottom: 12px;
+            }
+
+            .guide-scale-item {
+                padding: 9px 10px;
+                gap: 8px;
+            }
+
+            .guide-scale-badge {
+                width: 24px;
+                height: 24px;
+                font-size: 0.72rem;
+                border-radius: 6px;
+            }
+
+            .guide-scale-info strong {
                 font-size: 0.78rem;
             }
 
-            .likert-legend-bar .legend-item:nth-child(4) { order: 1; }
-            .likert-legend-bar .legend-item:nth-child(3) { order: 2; }
-            .likert-legend-bar .legend-item:nth-child(2) { order: 3; }
-            .likert-legend-bar .legend-item:nth-child(1) { order: 4; }
+            .guide-scale-info span {
+                font-size: 0.69rem;
+            }
+
+            .guide-footnote {
+                font-size: 0.76rem;
+                padding-top: 10px;
+            }
 
             .dimension-card {
                 margin-bottom: 20px;
@@ -1180,13 +1258,7 @@
                 <span>&#9875; PORT &amp; STEVEDORING EXCELLENCE</span>
             </div>
             <h1 class="hero-title">Survei Kepuasan Pelanggan</h1>
-            <p class="hero-desc">Evaluasi Mutu Pelayanan Operasional Bongkar Muat (Stevedoring) PT Kaltim Adhiguna Dermaga demi Terwujudnya Pelayanan Kepelabuhanan yang Prima, Aman, dan Andal.</p>
-            <div class="hero-highlights">
-                <span class="highlight-pill">&#128737;&#65039; Keamanan Kargo (Zero Damage)</span>
-                <span class="highlight-pill">&#9201;&#65039; Ketepatan Waktu &amp; Jadwal</span>
-                <span class="highlight-pill">&#129466; Standar Keselamatan K3 Lapangan</span>
-                <span class="highlight-pill">&#128202; Skala Penilaian Likert 4 Resmi</span>
-            </div>
+            <p class="hero-desc">Evaluasi Mutu Pelayanan Operasional Bongkar Muat (<i>Stevedoring</i>) PT Kaltim Adhiguna Dermaga demi Terwujudnya Pelayanan yang Prima, Aman, dan Handal.</p>
         </div>
     </section>
 
@@ -1221,8 +1293,8 @@
                         </div>
 
                         <div class="form-group">
-                            <label for="nama_responden">&#128100; Nama Lengkap Responden <span class="required">*</span></label>
-                            <input type="text" id="nama_responden" name="nama_responden" class="form-control" placeholder=" " required>
+                            <label for="nama_responden">&#128100; Nama Responden</label>
+                            <input type="text" id="nama_responden" name="nama_responden" class="form-control" placeholder=" ">
                             <p class="form-hint">Nama personel atau penanggung jawab operasional yang mengisi kuesioner.</p>
                         </div>
 
@@ -1248,12 +1320,41 @@
                 <!-- ======================================================== -->
                 <div id="step-2" class="step-section" style="display: none;">
                     
-                    <!-- PANDUAN SKALA LIKERT RESMI KAD -->
-                    <div class="likert-legend-bar">
-                        <div class="legend-item"><span class="legend-dot dot-tp">1</span> Tidak Puas (TP)</div>
-                        <div class="legend-item"><span class="legend-dot dot-cp">2</span> Cukup Puas (CP)</div>
-                        <div class="legend-item"><span class="legend-dot dot-p">3</span> Puas (P)</div>
-                        <div class="legend-item"><span class="legend-dot dot-sp">4</span> Sangat Puas (SP)</div>
+                    <!-- PETUNJUK PENGISIAN KUESIONER RESMI PT KAD -->
+                    <div class="guide-card">
+                        <div class="guide-header">
+                            <div class="guide-header-title">&#128203; Petunjuk Pengisian Kuesioner</div>
+                            <p class="guide-header-desc">Isilah penilaian pada setiap butir pertanyaan sesuai dengan keterangan skala di bawah ini:</p>
+                        </div>
+                        <div class="guide-body">
+                            <div class="guide-scale-grid">
+                                <div class="guide-scale-item scale-sp">
+                                    <span class="guide-scale-badge dot-sp">SP</span>
+                                    <div class="guide-scale-info">
+                                        <strong>4 &bull; Sangat Puas</strong>
+                                    </div>
+                                </div>
+                                <div class="guide-scale-item scale-p">
+                                    <span class="guide-scale-badge dot-p">P</span>
+                                    <div class="guide-scale-info">
+                                        <strong>3 &bull; Puas</strong>
+                                    </div>
+                                </div>
+                                <div class="guide-scale-item scale-cp">
+                                    <span class="guide-scale-badge dot-cp">CP</span>
+                                    <div class="guide-scale-info">
+                                        <strong>2 &bull; Cukup Puas</strong>
+                                    </div>
+                                </div>
+                                <div class="guide-scale-item scale-tp">
+                                    <span class="guide-scale-badge dot-tp">TP</span>
+                                    <div class="guide-scale-info">
+                                        <strong>1 &bull; Tidak Puas</strong>
+                                    </div>
+                                </div>
+                            </div>
+                            <p class="guide-footnote">Setiap jawaban diisi secara objektif sesuai keadaan dan pengalaman Anda terhadap layanan bongkar muat (<i>stevedoring</i>) PT Kaltim Adhiguna Dermaga.</p>
+                        </div>
                     </div>
 
                     <!-- 1. DIMENSI DAYA TANGGAP (RESPONSIVENESS) -->
@@ -1808,16 +1909,10 @@
             const stepCounterText = document.getElementById('step-counter-text');
 
             if (step === 2) {
-                // Validasi data identitas responden sebelum lanjut
-                const nama = document.getElementById('nama_responden');
+                // Validasi data identitas perusahaan (Nama Responden bersifat opsional)
                 const perusahaan = document.getElementById('nama_perusahaan');
                 const alamat = document.getElementById('alamat_perusahaan');
 
-                if (!nama.value.trim()) {
-                    alert('Mohon isi Nama Lengkap Responden terlebih dahulu.');
-                    nama.focus();
-                    return;
-                }
                 if (!perusahaan.value.trim()) {
                     alert('Mohon isi Nama Perusahaan terlebih dahulu.');
                     perusahaan.focus();

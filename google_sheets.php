@@ -262,7 +262,7 @@ class GoogleSheetsService {
 
             $rows = [];
             foreach ($values as $index => $row) {
-                if (empty($row) || !isset($row[1])) continue;
+                if (empty($row) || (!isset($row[1]) && !isset($row[2]))) continue;
                 $rows[] = [
                     'id'                => $index + 1,
                     'created_at'        => $row[0] ?? date('Y-m-d H:i:s'),

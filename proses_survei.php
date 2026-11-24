@@ -5,10 +5,11 @@ if ($_SERVER["REQUEST_METHOD"] !== "POST") {
     exit;
 }
 
-// 1. Menangkap input Identitas Responden
-$nama_responden   = $_POST['nama_responden'] ?? null;
-$nama_perusahaan  = $_POST['nama_perusahaan'] ?? null;
-$alamat_perusahaan = $_POST['alamat_perusahaan'] ?? null;
+// 1. Menangkap input Identitas Responden (Nama Responden bersifat opsional)
+$nama_responden_raw = trim($_POST['nama_responden'] ?? '');
+$nama_responden     = $nama_responden_raw !== '' ? $nama_responden_raw : '-';
+$nama_perusahaan    = trim($_POST['nama_perusahaan'] ?? '');
+$alamat_perusahaan  = trim($_POST['alamat_perusahaan'] ?? '');
 
 // 2. Menangkap input Dimensi Daya Tanggap (Responsiveness)
 $resp_1 = isset($_POST['resp_1']) ? (int)$_POST['resp_1'] : null;
